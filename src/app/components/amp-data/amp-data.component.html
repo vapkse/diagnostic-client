@@ -1,0 +1,39 @@
+<div class="title" [attr.id]="ampInfo.id">
+    <span id="amp-name" *ngIf="ampInfo.name">{{ampInfo.name}}</span>
+    <span id="amp-descr" *ngIf="ampInfo.description">{{ampInfo.description}}</span>
+    <ng-container *ngIf="ampDataService.ampStatus$ | async as ampStatus">
+        <span id="amp-status" *ngIf="!ampInfo.master">
+            <span id="amp-status-text" *ngIf="!!ampStatus.interval && !!ampStatus.statusText">online from {{ampStatus.interval}} {{ampStatus.statusText === 'maybe'? '?' : ''}}</span>
+            <span id="amp-status-flags" [attr.led]="ampStatus.flags" *ngIf="ampStatus.flags !== undefined" title="Working Point and Differential Feedback Statuses"></span>
+        </span>
+        <span id="params" class="button-wrapper" *ngIf="ampInfo.paramsInfos && ampInfo.paramsInfos.length && ampStatus && ampStatus.status===2">
+            <button class="request-btn" (click)="ampService.currentParamsAmpInfo$.next(ampInfo)" mat-icon-button>
+                <mat-icon class="mat-24">settings</mat-icon>
+            </button>
+        </span>
+    </ng-container>
+</div>
+<ng-container *ngIf="ampDataService.ampData$ | async as ampData">
+    <div>
+        <span *ngFor="let tube of ampInfo.tubes; let i=index" class="tube-infos">
+            <regulator-gauge [ampinfos]="ampInfo" [error]="ampData.errorNumber>0 && ampData.extraValue===i+1" [tube]="tube" [value]="getVal(ampData, i)" [ref]="getRef(ampData, i)" [min]="getMin(ampData, i)" [max]="getMax(ampData, i)"></regulator-gauge>
+            <output-gauge [ampinfos]="ampInfo" [tube]="tube" [value]="getOut(ampData, i)"></output-gauge>
+        </span>
+    </div>
+    <ng-container *ngIf="ampDataService.tempInfos$ | async as tempInfos">
+        <ng-container *ngIf="ampData.temp as tempValues">
+            <span *ngFor="let sensor of tempInfos; let i=index" class="temp-sensor">
+                <temp-gauge [sensorInfos]="sensor" [value]="tempValues[sensor.index !== undefined ? sensor.index : i]"></temp-gauge>
+            </span>
+        </ng-container>
+    </ng-container>
+    <span class="mod-gauge" *ngIf="ampInfo.modFactor">
+        <mod-gauge [modFactor]="ampInfo.modFactor" [datas]="ampData" [tick]=ampData.tick></mod-gauge>
+    </span>
+    <div id="step-panel" *ngIf="hasStepInfo(ampData)">
+        <step-indicator [steps]="ampInfo.stepMap" [error]="getStepError(ampData)" [stepIndex]="ampData.step" [maxTime]="ampData.steptmax" [elapsedTime]="ampData.steptelaps" [maxValue]="ampData.stepvmax" [value]="ampData.stepval"></step-indicator>
+    </div>
+</ng-container>
+<ng-container *ngIf="ampDataService.ampStatus$ | async as ampStatus">
+    <amp-controls *ngIf="ampInfo.controlsSet.size && ampStatus && ampStatus.status===2" [ampInfo]="ampInfo"></amp-controls>
+</ng-container>

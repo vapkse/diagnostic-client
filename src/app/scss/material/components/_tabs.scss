@@ -1,0 +1,49 @@
+@use '../../variables/colors'as colors;
+
+@mixin custom-tabs() {
+    mat-tab-group {
+        &[multi-lines] {
+            .mat-tab-header {
+                display: block;
+
+                .mat-tab-label {
+                    display: inline-block;
+                }
+            }
+        }
+
+        .mat-tab-header {
+            .mat-tab-label {
+                height: auto;
+                line-height: normal;
+                min-width: unset;
+                padding: 18px 24px;
+                position: relative;
+                white-space: nowrap;
+                color: colors.$fg-lighter !important;
+
+                &:after {
+                    background-color: colors.$bg-secondary;
+                    bottom: 0;
+                    content: '';
+                    height: 2px;
+                    left: 50%;
+                    position: absolute;
+                    transition: all 500ms ease;
+                    width: 0;
+                }
+
+                &.mat-tab-active {
+                    &:after {
+                        left: 0;
+                        width: 100%;
+                    }
+                }
+            }
+
+            mat-ink-bar {
+                background-color: colors.$bg-secondary !important;
+            }
+        }
+    }
+}

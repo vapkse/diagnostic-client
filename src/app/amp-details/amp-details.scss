@@ -1,0 +1,75 @@
+@use 'app/scss/variables/colors'as colors;
+
+:host {
+    display: block;
+
+    #view-title {
+        display: inline-block;
+        margin: 0 2rem 1rem 0;
+        font-size: 200%;
+        font-weight: 500;
+        color: colors.$fg-darker;
+    }
+
+    #view-content {
+        display: block;
+        margin: 0 25px 10px 25px;
+
+        ul {
+            margin: 0 0 2em 1em;
+            list-style-type: square;
+            padding: 0;
+        }
+
+        ul li {
+            position: relative;
+            margin: .5em;
+        }
+
+        .sub-content {
+            margin-bottom: 2rem;
+        }
+
+        #bg {
+            background-color: #000;
+        }
+
+        .sub-content .picture,
+        .sub-content .schematic,
+        .sub-content .measure {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .sub-content .schematic,
+        .sub-content .measure {
+            margin-bottom: 2rem;
+        }
+
+        .sub-content .picture img {
+            max-width: 100%;
+        }
+
+        .sub-content .schematic img,
+        .sub-content .measure img {
+            max-width: 98%;
+        }
+
+        .sub-content .description {
+            font-style: italic;
+        }
+
+        .sub-title {
+            display: inline-block;
+            font-size: 180%;
+            margin-bottom: 1rem;
+            margin-right: 2rem;
+            font-weight: 500;
+            color: colors.$fg-darker;
+        }
+
+        .sub-content .sub-title {
+            display: block;
+        }
+    }
+}

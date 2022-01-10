@@ -1,0 +1,7 @@
+@use '../../variables/colors'as colors;
+
+@mixin custom-spinner() {
+    .mat-progress-spinner path {
+        stroke: rgba(colors.$bg-secondary, .9) !important;
+    }
+}

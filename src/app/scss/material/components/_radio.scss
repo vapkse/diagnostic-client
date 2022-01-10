@@ -1,0 +1,41 @@
+@use '../../variables/colors'as colors;
+
+@mixin custom-radio() {
+    mat-radio-group {
+        .mat-radio-checked {
+            .mat-radio-inner-circle {
+                background-color: colors.$bg-secondary;
+            }
+
+            .mat-radio-outer-circle {
+                border-color: colors.$bg-secondary;
+            }
+        }
+
+        .mat-radio-focused {
+            .mat-ink-ripple {
+                background-color: rgba(colors.$bg-secondary, .2);
+            }
+        }
+
+        &.ng-invalid {
+            label {
+                color: colors.$fg-error;
+
+                .mat-radio-outer-circle {
+                    border-color: colors.$fg-error;
+                }
+
+                .mat-radio-inner-circle {
+                    background-color: colors.$fg-error;
+                }
+            }
+
+            .mat-radio-focused {
+                .mat-ink-ripple {
+                    background-color: rgba(colors.$fg-error, .2);
+                }
+            }
+        }
+    }
+}

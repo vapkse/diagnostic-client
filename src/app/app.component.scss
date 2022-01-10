@@ -1,0 +1,182 @@
+@use 'app/scss/variables/colors'as colors;
+
+app-root {
+    #sidenav {
+        height: 100%;
+
+        .mat-sidenav-backdrop {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        #content-wrapper {
+            overflow: auto;
+            scroll-behavior: smooth;
+            height: 100%;
+
+            #app-content {
+                margin: 1rem 2rem;
+            }
+
+            mat-toolbar {
+                background: transparent;
+                color: colors.$fg-darker;
+                margin: 2rem 0 0 0;
+                font-size: 250%;
+                font-weight: 500;
+
+                button {
+                    width: 4rem;
+                    height: 4rem;
+
+                    mat-icon {
+                        width: 2rem;
+                        font-size: 2rem;
+                    }
+                }
+
+                #app-title {
+                    flex-grow: 1;
+                }
+            }
+        }
+
+        mat-sidenav {
+            background-color: colors.$bg-darker;
+
+            /* items class */
+            .items {
+                margin: 0 0 2em 0;
+                list-style-type: none;
+                padding: 0;
+                width: 17em;
+
+                li {
+                    cursor: pointer;
+                    margin: 0.4rem .5rem;
+                    padding: .1rem 0;
+                    min-height: 2.2rem;
+                    border-radius: 4px;
+                    display: flex;
+                    align-items: center;
+
+                    &.selected {
+                        color: colors.$bg-selected;
+                        font-size: 120%;
+
+                        .id {
+                            background-color: colors.$bg-selected;
+                        }
+                    }
+
+                    &:hover {
+                        color: colors.$fg-lighter;
+                        background-color: colors.$bg-lighter;
+                    }
+
+                    &.selected:hover {
+                        color: colors.$fg-selected;
+                        background-color: colors.$bg-selected;
+                    }
+
+                    .id {
+                        font-size: small;
+                        text-align: center;
+                        padding: 0.8rem 0.7rem 0 0.7rem;
+                        color: colors.$fg-secondary;
+                        background-color: colors.$bg-secondary;
+                        height: 1.8rem;
+                        width: 1.8rem;
+                        margin-right: .8rem;
+                        border-radius: 4px 0 0 4px;
+                    }
+                }
+            }
+
+            &#sidenav-end {
+                width: 36rem;
+                height: 100%;
+
+                #user-panel {
+                    height: 2rem;
+                    margin: 3rem 10% 1.5rem 10%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+
+                    #logout {
+                        color: colors.$fg-darker;
+                        display: flex;
+                        width: 100%;
+                        flex-direction: row-reverse;
+                        align-items: center;
+                    }
+                }
+
+                amp-params {
+                    height: calc(100% - 0.5rem);
+                    display: block;
+                }
+
+                .session-panel {
+                    position: absolute;
+                    top: 0;
+                    opacity: 0;
+                    transition: opacity 500ms ease-out;
+                    z-index: 0;
+                    margin: 3rem 10%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+
+                    .spnl-title {
+                        font-size: 200%;
+                        color: colors.$fg-darker;
+                        margin-bottom: 1.5rem;
+                    }
+
+                    mat-form-field {
+                        width: 100%;
+                        margin-bottom: 1.5rem;
+
+                        mat-icon {
+                            opacity: 0.8;
+                            color: colors.$fg-darker;
+                            margin-right: 0.2rem;
+                        }
+
+                        input {
+                            vertical-align: super;
+                        }
+
+                        .mat-input-placeholder.mat-empty:not(.mat-focused) {
+                            margin-top: 0.3rem;
+                        }
+                    }
+
+                    [mat-link] {
+                        margin-top: 0.5rem;
+                    }
+                }
+
+                .spnl-btn {
+                    color: colors.$fg-darker;
+                    width: 4rem;
+                    height: 4rem;
+
+                    mat-icon {
+                        width: 2rem;
+                        font-size: 2rem;
+                    }
+                }
+            }
+        }
+
+        &[currentpanel="login"] #login-panel,
+        &[currentpanel="reset"] #reset-panel,
+        &[currentpanel="signup"] #signup-panel {
+            opacity: 1 !important;
+            z-index: 1 !important;
+            transition: opacity 500ms ease-in !important;
+        }
+    }
+}

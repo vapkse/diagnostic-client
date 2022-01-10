@@ -1,0 +1,15 @@
+{
+    "root": true,
+    "extends": [
+        "@hug/eslint-config/recommended"
+    ],
+    "overrides": [{
+        "files": ["src/**/*.ts"],
+        "plugins": ["deprecation"],
+        "rules": {
+            // This rule is not added in lib waiting for automatic fix
+            "@angular-eslint/sort-ngmodule-metadata-arrays": "error",
+            "deprecation/deprecation": "warn"
+        }
+    }]
+}

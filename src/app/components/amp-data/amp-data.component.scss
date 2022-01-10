@@ -1,0 +1,98 @@
+@use 'app/scss/variables/colors'as colors;
+
+amp-data {
+    &:not(.master) {
+        .title {
+            margin-bottom: 2rem;
+        }
+    }
+
+    .title {
+        #amp-name {
+            font-size: 150%;
+            font-weight: 500;
+            color: colors.$fg-darker;
+        }
+
+        #amp-descr,
+        #amp-status {
+            flex: 1 1 auto;
+        }
+
+        >span {
+            margin: 0 1rem;
+            align-self: center;
+        }
+
+        #amp-status {
+            display: flex;
+            align-items: center;
+
+            >[led] {
+                display: flex;
+                width: 1rem;
+                height: 1rem;
+                border-radius: 50%;
+                background: rgb(255, 82, 82);
+                margin: 0 1rem;
+            }
+
+            >[led="true"] {
+                background: #91EE91;
+            }
+        }
+
+        margin: 1rem 0.5rem 1rem 0.5rem;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .tube-infos,
+    .temp-sensor,
+    .mod-gauge,
+    #step-indicator {
+        display: inline-block;
+    }
+
+    .tube-infos regulator-gauge {
+        display: block;
+        margin: 0 1.2rem 0.3rem 1.2rem;
+        width: 12rem;
+        height: 12rem;
+    }
+
+    .tube-infos output-gauge {
+        display: block;
+        margin: 0.3rem 3rem 2.1rem 3rem;
+        width: 8rem;
+        height: 2.8rem;
+    }
+
+    .temp-sensor temp-gauge,
+    .mod-gauge mod-gauge {
+        display: block;
+        margin: 0 1.8rem 1.5rem 1.8rem;
+        width: 10.8rem;
+        height: 10.8rem;
+    }
+
+    #step-panel {
+        height: 4rem;
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 0 0 0 3rem;
+
+        step-indicator {
+            display: block;
+            width: 22rem;
+            height: 4rem;
+        }
+
+        #params {
+            padding: 1rem;
+            flex: 0 0 2rem;
+        }
+    }
+}

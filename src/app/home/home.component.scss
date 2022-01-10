@@ -1,0 +1,69 @@
+@use 'app/scss/variables/colors'as colors;
+
+home-page {
+    #onlineAmps {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        .master {
+            width: 100%;
+            display: block;
+        }
+    }
+
+    #view-title,
+    #nowplaying {
+        margin: 0 2rem 0 0;
+        font-weight: 500;
+        color: colors.$fg-darker;
+        font-size: 180%;
+    }
+
+    iframe {
+        width: 95vw;
+        height: 95vh;
+    }
+
+    #artist-content-title,
+    #amp-content-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        #view-title {
+            flex: 0 0 auto;
+        }
+
+        #nowplaying {
+            font-size: 100%;
+            text-align: right;
+            flex: 1 1 auto;
+        }
+
+        #loading {
+            flex: 1 0 auto;
+        }
+    }
+
+    amp-data:not(.master) {
+        display: inline-block;
+        border: 1px solid colors.$bg-secondary;
+        margin: 0 0.8rem 2rem 0;
+    }
+
+    #controls,
+    #onlineDatas,
+    #nodata {
+        margin-bottom: 2rem;
+    }
+
+    #onlineDatas {
+        display: flex;
+    }
+
+    a,
+    a:visited {
+        color: colors.$fg-darker !important;
+    }
+}

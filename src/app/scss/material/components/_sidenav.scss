@@ -1,0 +1,10 @@
+@mixin custom-sidenav() {
+    .mat-sidenav-container {
+        background: transparent;
+    }
+
+    .mat-sidenav-container,
+    .mat-drawer {
+        color: inherit;
+    }
+}

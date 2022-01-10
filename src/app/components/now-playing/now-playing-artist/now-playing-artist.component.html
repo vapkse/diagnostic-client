@@ -1,0 +1,82 @@
+<div [attr.noinfos]="!artist.idArtist || null" class="artist-title center">{{artist.strArtist}}<span class="artist-alternate" *ngIf="artist.strArtistAlternate">({{artist.strArtistAlternate}})</span></div>
+<ng-container *ngIf="artist.idArtist; else noInfos">
+    <ng-container *ngIf="nowPlayingService.getPictureUrls(artist) as pictureUrls">
+        <div class="artist-image" *ngIf="pictureUrls.length > 0">
+            <app-slider #slider class="full">
+                <div appSliderItem *ngFor="let pictureUrl of pictureUrls">
+                    <img [src]="pictureUrl" (dblclick)="openInNewTab(pictureUrl)" (load)="slider.refresh$.next()" (error)="slider.refresh$.next()">
+                </div>
+            </app-slider>
+        </div>
+    </ng-container>
+    <div *ngIf="artist.idArtist" class="artist-content center">
+        <ng-container *ngIf="nowPlayingService.getWebSites(artist) as webSites">
+            <ng-container *ngIf="webSites.length > 0">
+                <div class="info center">
+                    <div class="weblink" *ngFor="let webSite of webSites; trackBy:trackBy" [attr.type]="webSite.name" [matTooltip]="webSite.url">
+                        <a [href]="webSite.url" target="_blank">{{ webSite.name }}</a>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+        <mat-card>
+            <mat-card-header>
+                BIOGRAPHY
+            </mat-card-header>
+            <mat-card-content>
+                <ng-container *ngIf="nowPlayingService.getBiography(artist) as biography; else noInfos">
+                    <div class="info center bio" [innerHTML]="biography"></div>
+                </ng-container>
+            </mat-card-content>
+        </mat-card>
+        <mat-card>
+            <mat-card-header>
+                INFORMATIONS SUR L'ARTIST
+            </mat-card-header>
+            <mat-card-content>
+                <div class="info center artist-infos" *ngIf="hasArtistInfos(artist) ; else noInfos">
+                    <div class="artist-info" *ngIf="artist.strCountry || artist.strCountryCode">
+                        <span class="artist-info-title">Origin</span>
+                        <span class="artist-info-content">
+                            <span *ngIf="artist.strCountry">{{ artist.strCountry || artist.strCountryCode }}</span>
+                        </span>
+                    </div>
+                    <div class="artist-info" *ngIf="artist.strStyle || artist.strGenre">
+                        <span class="artist-info-title">Style</span>
+                        <span class="artist-info-content">
+                            <span *ngIf="artist.strStyle">{{ artist.strStyle }};&nbsp;</span><span *ngIf="artist.strGenre">{{ artist.strGenre }}</span>
+                        </span>
+                    </div>
+                    <div class="artist-info" *ngIf="artist.strMood">
+                        <span class="artist-info-title">Mood</span>
+                        <span class="artist-info-content">
+                            {{ artist.strMood }}
+                        </span>
+                    </div>
+                    <div class="artist-info" *ngIf="artist.intFormedYear || artist.intDiedYear">
+                        <span class="artist-info-title">Active</span>
+                        <span class="artist-info-content">
+                            {{ artist.intFormedYear }}<span *ngIf="artist.intDiedYear">&nbsp;-&nbsp;{{ artist.intDiedYear }}</span>
+                        </span>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</ng-container>
+<ng-template #loading>
+    <div class="info center spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+    </div>
+</ng-template>
+<ng-template #noInfos>
+    <ng-container *ngIf="!artist.error; else errorInfo">
+        <div class="info center">No Informations</div>
+    </ng-container>
+</ng-template>
+<ng-template #errorInfo>
+    <div class="info center error">{{artist.error}}</div>
+</ng-template>
+<!-- {{ artist | json }} -->

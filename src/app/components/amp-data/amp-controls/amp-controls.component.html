@@ -1,0 +1,27 @@
+<ng-template #snackBarTemplate let-item>
+    <div class="message-wrapper">
+        <mat-icon class="icon" *ngIf="item.type==='danger'" class="mat-24">cancel</mat-icon>
+        <span class="message">{{ item.content }}</span>
+    </div>
+</ng-template>
+<div id="controls" *ngIf="ampService.isAdmin$ | async">
+    <div class="button-wrapper" *ngIf="ampInfo.controlsSet.has('reset')">
+        <button class="control-btn" (click)="reset$.next()" mat-icon-button>
+            <mat-icon class="mat-24">cached</mat-icon>
+        </button>
+        <span class="control-title">Reset</span>
+        <div class="warning" *ngIf="onReset$ | async">Press again to confirm.</div>
+    </div>
+    <div id="stop" class="button-wrapper" *ngIf="ampInfo.controlsSet.has('stop')">
+        <button class="control-btn" (click)="action$.next('stop')" mat-icon-button>
+            <mat-icon class="mat-24">power_settings_new</mat-icon>
+        </button>
+        <span class="control-title">Stop</span>
+    </div>
+    <div id="reset-mod" class="button-wrapper" *ngIf="ampInfo.controlsSet.has('resetModulation')">
+        <button class="control-btn" (click)="action$.next('resetModulation')" mat-icon-button>
+            <mat-icon class="mat-24">trending_down</mat-icon>
+        </button>
+        <span class="control-title">Reset Modulation</span>
+    </div>
+</div>

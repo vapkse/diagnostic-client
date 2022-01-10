@@ -1,0 +1,21 @@
+@use '../../variables/colors'as colors;
+
+@mixin custom-slide-toggle() {
+    .mat-slide-toggle {
+        &.mat-checked {
+            &.mat-slide-toggle-focused {
+                .mat-ink-ripple {
+                    background-color: rgba(colors.$bg-secondary, .2) !important;
+                }
+            }
+
+            .mat-slide-toggle-thumb {
+                background-color: colors.$bg-secondary !important;
+            }
+
+            .mat-slide-toggle-bar {
+                background-color: rgba(colors.$bg-secondary, .5) !important;
+            }
+        }
+    }
+}

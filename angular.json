@@ -1,0 +1,120 @@
+{
+    "$schema": "./node_modules/@angular-devkit/core/src/workspace/workspace-schema.json",
+    "version": 1,
+    "newProjectRoot": "projects",
+    "projects": {
+        "diagnostic-client": {
+            "root": "",
+            "projectType": "application",
+            "architect": {
+                "build": {
+                    "builder": "@angular-devkit/build-angular:browser",
+                    "options": {
+                        "baseHref": "/",
+                        "outputPath": "dist",
+                        "index": "src/index.html",
+                        "main": "src/main.ts",
+                        "polyfills": "src/polyfills.ts",
+                        "tsConfig": "src/tsconfig.app.json",
+                        "assets": [{
+                                "glob": "favicon.ico",
+                                "input": "src",
+                                "output": "/"
+                            },
+                            {
+                                "glob": "**/*",
+                                "input": "src/assets/",
+                                "output": "assets/"
+                            }
+                        ],
+                        "styles": [{
+                            "input": "src/styles.scss",
+                            "inject": true
+                        }],
+                        "scripts": [],
+                        "preserveSymlinks": true,
+                        "aot": false,
+                        "vendorChunk": true,
+                        "extractLicenses": false,
+                        "buildOptimizer": false,
+                        "sourceMap": true,
+                        "optimization": false,
+                        "namedChunks": true
+                    },
+                    "configurations": {
+                        "production": {
+                            "fileReplacements": [{
+                                "src": "src/environments/environment.ts",
+                                "replaceWith": "src/environments/environment.prod.ts"
+                            }],
+                            "baseHref": "./",
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": false,
+                            "buildOptimizer": true,
+                            "preserveSymlinks": false
+                        },
+                        "development": {}
+                    },
+                    "defaultConfiguration": "production"
+                },
+                "serve": {
+                    "builder": "@angular-devkit/build-angular:dev-server",
+                    "options": {
+                        "port": 888
+                    },
+                    "configurations": {
+                        "production": {
+                            "browserTarget": "diagnostic-client:build:production"
+                        },
+                        "development": {
+                            "browserTarget": "diagnostic-client:build:development"
+                        }
+                    },
+                    "defaultConfiguration": "development"
+                },
+                "extract-i18n": {
+                    "builder": "@angular-devkit/build-angular:extract-i18n",
+                    "options": {
+                        "browserTarget": "diagnostic-client:build"
+                    }
+                },
+                "test": {
+                    "builder": "@angular-devkit/build-angular:karma",
+                    "options": {
+                        "main": "src/test.ts",
+                        "polyfills": "src/polyfills.ts",
+                        "tsConfig": "src/tsconfig.spec.json",
+                        "karmaConfig": "karma.conf.js",
+                        "styles": [{
+                            "input": "styles.scss",
+                            "inject": true
+                        }],
+                        "scripts": [],
+                        "assets": [{
+                                "glob": "favicon.ico",
+                                "input": "src/",
+                                "output": "/"
+                            },
+                            {
+                                "glob": "**/*",
+                                "input": "src/assets/",
+                                "output": "assets/"
+                            }
+                        ]
+                    }
+                },
+                "lint": {
+                    "builder": "@angular-eslint/builder:lint",
+                    "options": {
+                        "lintFilePatterns": ["**/*.js", "**/*.ts", "**/*.component.html"]
+                    }
+                }
+            }
+        }
+    }
+}

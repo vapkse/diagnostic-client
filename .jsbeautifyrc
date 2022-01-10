@@ -1,0 +1,26 @@
+{
+    "eol": "\r\n",
+    "indent_size": 4,
+    "indent_with_tabs": false,
+    "preserve_newlines": true,
+    "max_preserve_newlines": 2,
+    "indent_handlebars": true,
+    "wrap_line_length": 0,
+    "html": {
+        "unformatted": [
+            "a",
+            "sub",
+            "sup",
+            "b",
+            "i",
+            "u"
+        ],
+        "js": {
+            "end_with_newline": false
+        },
+        "css": {
+            "end_with_newline": false
+        }
+    },
+    "end_with_newline": true
+}

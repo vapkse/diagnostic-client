@@ -1,0 +1,67 @@
+@use 'app/scss/variables/colors'as colors;
+
+amp-controls {
+    #controls {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-around;
+        width: 100%;
+        margin-bottom: 0.5rem;
+
+        #stop {
+            color: colors.$fg-danger;
+        }
+
+        .button-wrapper {
+            flex: 0 1 230px;
+            margin: 0 0.5rem;
+        }
+
+        .warning {
+            color: colors.$fg-warning;
+            font-size: 80%;
+        }
+
+        #control-message {
+            font-size: 80%;
+            color: colors.$fg-ok;
+        }
+
+        &#control-msgwrapper {
+            min-height: 1rem;
+        }
+
+        .control-btn {
+            margin: 0.5rem 0;
+        }
+    }
+}
+
+.cdk-overlay-container {
+    .message-template {
+        white-space: pre-wrap;
+
+        &.danger {
+            background-color: #E53935 !important;
+            color: #fff !important;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            .icon {
+                flex: 0 0 auto;
+            }
+
+            .message {
+                text-align: left;
+                flex: 1 1 auto;
+                padding-left: 1rem;
+            }
+        }
+    }
+}

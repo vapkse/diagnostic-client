@@ -1,0 +1,3 @@
+[submodule "src/app/common"]
+	path = src/app/common
+	url = https://gitlab.com/botoela/diagnostic-common.git

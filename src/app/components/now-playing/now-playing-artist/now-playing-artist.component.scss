@@ -1,0 +1,125 @@
+@use 'app/scss/variables/colors'as colors;
+@use 'app/scss/components/spinner';
+
+now-playing-artist {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid colors.$bg-secondary;
+    margin: 0 0.8rem 0.8rem 0;
+    padding: 2rem;
+
+    .center {
+        flex-wrap: wrap;
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+    }
+
+    .info {
+        padding: 2rem 0 1rem 0;
+    }
+
+    .error {
+        color: colors.$fg-error;
+    }
+
+    .artist-title {
+        flex: 0 0 auto;
+        font-size: 200%;
+        font-weight: 500;
+        color: colors.$fg-darker;
+        text-transform: capitalize;
+
+        .artist-alternate {
+            padding-left: 1rem;
+            font-size: medium;
+        }
+    }
+
+    .artist-image {
+        padding: 2rem 0 0 0;
+
+        app-slider {
+            display: block;
+
+            [appSliderItem] {
+                flex-shrink: 0;
+                padding: 0 0.3rem;
+
+                img {
+                    max-width: 500px;
+                    max-height: 500px;
+                }
+            }
+        }
+    }
+
+    .artist-content {
+        padding: 3rem 0 0 0;
+
+        .weblink {
+            a {
+                padding: 0.5rem;
+                text-decoration: none;
+                color: colors.$fg-darker;
+            }
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+            &[type="Facebook"] {
+                font-size: 80%;
+                opacity: 0.75;
+            }
+
+            &[type="AudioDB"],
+            &[type="MusicBrainz"] {
+                font-size: 150%;
+                opacity: 1;
+            }
+
+            &[type="Twitter"] {
+                font-size: 90%;
+                opacity: 1;
+            }
+        }
+
+        .mat-card {
+            width: 100%;
+            margin: 1rem 0;
+
+            .mat-card-header {
+                color: colors.$fg-darker;
+                font-size: 120%;
+            }
+
+            .bio {
+                font-size: 120%;
+            }
+
+            .artist-infos {
+                display: flex;
+                flex-wrap: wrap;
+
+                .artist-info {
+                    display: flex;
+                    flex-direction: column;
+                    padding: 1rem 3rem;
+
+                    .artist-info-title {
+                        color: colors.$fg-darker;
+                        font-size: 110%;
+                        padding: 0.5rem 0;
+                    }
+
+                    .artist-info-content {
+                        display: flex;
+                        padding-left: 0.2rem;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+@use '../../variables/colors'as colors;
+
+@mixin custom-toolbar() {
+    mat-toolbar {
+        &.mat-secondary {
+            background-color: colors.$bg-secondary !important;
+            color: colors.$fg-darker !important;
+        }
+
+        &.sticky {
+            position: fixed;
+            z-index: 20;
+
+            &.top {
+                top: 0;
+            }
+
+            &.bottom {
+                bottom: 0;
+            }
+        }
+    }
+}

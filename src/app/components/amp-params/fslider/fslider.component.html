@@ -1,0 +1,3 @@
+<span class="title" *ngIf="title">{{title}}</span>
+<input class="range" type="range" [disabled]="disabled" [value]="value" [step]="step" [min]="min" [max]="max" (change)="oninputchange($event)" (input)="oninput($event)">
+<span class="value" #valuecontrol [attr.contenteditable]="!disabled" (focus)="focus$.next()"></span>

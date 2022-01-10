@@ -1,0 +1,38 @@
+<ng-container *ngIf="ampService.selectedAmp$ | async as amp">
+    <span id="view-title">{{amp.name}}</span>
+
+    <div id="view-content">
+        <div id="description">{{amp.description}}</div>
+        <ul>
+            <li *ngIf="amp.dampingfactor">Damping Factor: {{amp.dampingfactor}}</li>
+            <li *ngIf="amp.power">Max Power: {{amp.power}}</li>
+            <li *ngIf="amp.bandwidth">Bandwidth: {{amp.bandwidth}}</li>
+            <li *ngIf="amp.amplificationfactor">Amplification Factor: {{amp.amplificationfactor}}</li>
+            <li *ngIf="amp.inverter === true">Inverter</li>
+            <li *ngIf="amp.inverter === false">Non inverter</li>
+        </ul>
+        <div class="sub-content" *ngIf="amp.pictures && amp.pictures.length">
+            <div class="sub-title">Pictures</div>
+            <div id="bg">
+                <span class="picture" *ngFor="let picture of amp.pictures" [style.max-width]="picture.width ? picture.width : '100%'">
+                    <img src="{{amp.picturesPath + picture.path}}">
+                    <div class="description" *ngIf="picture.description">{{picture.description}}</div>
+                </span>
+            </div>
+        </div>
+        <div class="sub-content" *ngIf="amp.schematics && amp.schematics.length">
+            <div class="sub-title">Schematics</div>
+            <span class="schematic" *ngFor="let schematic of amp.schematics" [style.max-width]="schematic.width ? schematic.width : '100%'">
+                <img src="{{amp.schematicsPath + schematic.path}}">
+                <div class="description" *ngIf="schematic.description">{{schematic.description}}</div>
+            </span>
+        </div>
+        <div class="sub-content" *ngIf="amp.measures && amp.measures.length">
+            <div class="sub-title">Measures</div>
+            <span class="measure" *ngFor="let measure of amp.measures" [style.max-width]="measure.width ? measure.width : '100%'">
+                <img src="{{amp.measuresPath + measure.path}}">
+                <div class="description" *ngIf="measure.description">{{measure.description}}</div>
+            </span>
+        </div>
+    </div>
+</ng-container>

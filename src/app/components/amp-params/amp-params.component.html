@@ -1,0 +1,38 @@
+<div id="error-panel" *ngIf="message" (click)="ampParamsService.refresh$.next(true)">
+    <div>{{ message }}</div>
+    <div id="reload">Click to reload</div>
+</div>
+<div id="waiter" *ngIf="waiter">
+    <div class="lds-ripple"> </div>
+</div>
+<ng-container *ngIf="ampInfo">
+    <form id="params-panel" *ngIf="formParams$ | async as formGroup" [formGroup]="formGroup" [attr.admin]="ampService.isAdmin$ | async">
+        <div id="amp-title" *ngIf="title$ | async as title" class="flex-row">{{ title }}</div>
+        <div class="flex-row" id="toggles" formArrayName="toggles">
+            <ng-container *ngFor="let toggle of toggles$ | async; let ti=index" [formGroupName]="ti">
+                <mat-slide-toggle formControlName="value">
+                    {{ toggle.title }}
+                </mat-slide-toggle>
+            </ng-container>
+        </div>
+        <div class="flex-row" id="sliders" formArrayName="sliders">
+            <ng-container *ngFor="let slider of sliders$ | async; let si=index" [formGroupName]="si">
+                <fslider formControlName="value" [attr.disabed]="slider.enabled === false" [title]="slider.title" [step]="slider.step || 1" [min]="slider.min || 0" [max]="slider.max || 255"></fslider>
+            </ng-container>
+        </div>
+        <div class="flex-row" *ngIf="ampService.isAdmin$ | async">
+            <div class="button-wrapper">
+                <button class="request-btn" [debounced-event]="sendRequest$({action:'writeParams'})" mat-icon-button>
+                    <mat-icon class="mat-24">save</mat-icon>
+                </button>
+                <span class="request-title">Save params</span>
+            </div>
+            <div class="button-wrapper">
+                <button class="request-btn" [debounced-event]="sendRequest$({action:'resetParams'})" mat-icon-button>
+                    <mat-icon class="mat-24">settings_backup_restore</mat-icon>
+                </button>
+                <span class="request-title">Reset to default</span>
+            </div>
+        </div>
+    </form>
+</ng-container>

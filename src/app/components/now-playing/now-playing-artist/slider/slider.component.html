@@ -1,0 +1,15 @@
+<div class="slider-container">
+    <div class="control left">
+        <button *ngIf="showButtons$ | async" mat-icon-button color="primary" aria-label="left" (click)="onClickLeft()">
+            <mat-icon>arrow_left</mat-icon>
+        </button>
+    </div>
+    <div class="slides" #slides>
+        <ng-content select="[appSliderItem]" #sliderItem></ng-content>
+    </div>
+    <div class="control right">
+        <button *ngIf="showButtons$ | async" mat-icon-button color="primary" aria-label="right" (click)="onClickRight()">
+            <mat-icon>arrow_right</mat-icon>
+        </button>
+    </div>
+</div>

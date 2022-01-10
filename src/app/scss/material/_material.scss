@@ -1,0 +1,25 @@
+@use './components/buttons'as buttons-mixin;
+@use './components/card'as card-mixin;
+@use './components/checkbox'as checkbox-mixin;
+@use './components/input'as input-mixin;
+@use './components/radio'as radio-mixin;
+@use './components/slide-toggle'as slide-toggle-mixin;
+@use './components/sidenav'as sidenav-mixin;
+@use './components/snackbar'as snackbar-mixin;
+@use './components/tabs'as tabs-mixin;
+@use './components/toolbar'as toolbar-mixin;
+
+#diagnostic {
+    @include buttons-mixin.custom-button();
+    @include card-mixin.custom-card();
+    @include checkbox-mixin.custom-checkbox();
+    @include input-mixin.custom-input();
+    @include radio-mixin.custom-radio();
+    @include slide-toggle-mixin.custom-slide-toggle();
+    @include sidenav-mixin.custom-sidenav();
+    @include snackbar-mixin.custom-snackbar();
+    @include tabs-mixin.custom-tabs();
+    @include toolbar-mixin.custom-toolbar();
+}
+
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';

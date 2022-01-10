@@ -1,0 +1,35 @@
+<mat-sidenav-container id="sidenav" class="app-root">
+    <mat-sidenav #sidenav position="start" id="sidenav-start">
+        <mat-nav-list>
+            <ul class="items">
+                <li [class.selected]="(ampService.selectedId$ | async) === null" (click)="select$.next(null)">
+                    <span class="id">&nbsp;</span>
+                    <span mat-list-item>Online Amps</span>
+                </li>
+                <li *ngFor="let item of navigationService.navList$ | async" [class.selected]="item.id === (ampService.selectedId$ | async)" (click)="select$.next(item.id)">
+                    <span class="id">{{item.id}}</span>
+                    <span mat-list-item>{{item.label}}
+                        <span *ngIf="item.isOnline">(online)</span>
+                        <span *ngIf="item.maybeOnline">(online?)</span>
+                    </span>
+                </li>
+            </ul>
+        </mat-nav-list>
+    </mat-sidenav>
+    <div id="content-wrapper">
+        <mat-toolbar>
+            <button mat-icon-button (click)="sidenav.open()">
+                <mat-icon class="mat-24">menu</mat-icon>
+            </button>
+            <div id="app-title">
+                Diagnostic
+            </div>
+        </mat-toolbar>
+        <div dir="ltr" id="app-content">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+    <mat-sidenav #sidefn position="end" id="sidenav-end" [opened]="!!(ampService.currentParamsAmpInfo$ | async)" (closed)="ampService.currentParamsAmpInfo$.next(null)">
+        <amp-params id="params-wrapper" [ampInfo]="ampService.currentParamsAmpInfo$ | async"></amp-params>
+    </mat-sidenav>
+</mat-sidenav-container>

@@ -1,0 +1,77 @@
+@use '../../variables/colors'as colors;
+
+@mixin custom-input() {
+    mat-form-field {
+        .mat-form-field-wrapper {
+            .mat-form-field-underline {
+                background-color: colors.$fg-secondary;
+
+                .mat-form-field-ripple {
+                    background-color: colors.$fg-darker;
+                }
+            }
+
+            .mat-form-field-label {
+                color: inherit;
+                opacity: 0.5;
+
+                &.mat-focused {
+                    color: colors.$fg-darker;
+                    opacity: 1;
+                }
+            }
+
+            input {
+                -webkit-appearance: textfield;
+                color: inherit;
+
+                &:-webkit-autofill,
+                &:-webkit-autofill:hover,
+                &:-webkit-autofill:focus,
+                &:-webkit-autofill:active {
+                    transition-delay: 9999s;
+                    transition: color 9999s ease-out, background-color 9999s ease-out;
+                }
+
+                &::-webkit-outer-spin-button,
+                &::-webkit-inner-spin-button {
+                    /* display: none; <- Crashes Chrome on hover */
+                    -webkit-appearance: none;
+                    margin: 0;
+                    /* <-- Apparently some margin are still there even though it's hidden */
+                }
+            }
+        }
+
+        ~.mat-form-field-message {
+            font-size: 0.8rem;
+            text-align: left;
+
+            &.ng-invalid {
+                color: colors.$fg-error;
+            }
+        }
+
+        &.ng-invalid.ng-dirty {
+            .mat-form-field-wrapper {
+                .mat-form-field-underline {
+                    .mat-form-field-ripple {
+                        background-color: colors.$fg-error;
+                    }
+                }
+
+                .mat-form-field-placeholder {
+                    color: colors.$fg-error;
+                }
+            }
+        }
+    }
+
+    .mat-hint {
+
+        &.validation-error,
+        .validation-error {
+            color: colors.$fg-error;
+        }
+    }
+}

@@ -1,0 +1,48 @@
+:host {
+    .slider-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .control {
+            flex: 1 1 auto;
+            display: flex;
+
+            &.left {
+                justify-content: flex-start;
+            }
+
+            &.right {
+                justify-content: flex-end;
+            }
+
+            .mat-icon-button {
+                width: 64px;
+                height: 64px;
+
+                .mat-icon {
+                    line-height: 48px;
+                    height: 48px;
+                    width: 48px;
+                    font-size: 48px;
+                }
+            }
+
+        }
+
+        .slides {
+            flex: 0 1 auto;
+            display: flex;
+            align-items: center;
+            overflow-x: scroll;
+            // This is not supported by all browsers. If you want a different animation, please feel free
+            // to find your own solution.
+            scroll-behavior: smooth;
+
+            &::-webkit-scrollbar {
+                width: 0px;
+                background: transparent;
+            }
+        }
+    }
+}

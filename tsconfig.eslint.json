@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": [
+            "jasmine",
+            "cypress",
+            "node",
+            "ckeditor"
+        ]
+    },
+    "include": [
+        "src/**/*.ts",
+        "e2e/**/*.ts"
+    ]
+}

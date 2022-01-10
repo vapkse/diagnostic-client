@@ -1,0 +1,15 @@
+<div #scrollable class="scrollable">
+    <div id="amp-content-title">
+        <span id="view-title">Online Amps</span>
+        <span *ngIf="loading$ | async" id="loading">Loading...</span>
+    </div>
+    <ng-container *ngIf="ampService.onlineAmps$ | async as onlineAmps">
+        <div id="nodata" *ngIf="!onlineAmps.length">No amplifier is online.</div>
+        <div id="onlineAmps">
+            <amp-data *ngFor="let ampInfo of onlineAmps" [ampInfo]="ampInfo" [class.master]="ampInfo.isMaster"></amp-data>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="nowPlayingService.nowPlaying$| async as nowPlaying">
+        <now-playing [nowPlaying]="nowPlaying"></now-playing>
+    </ng-container>
+</div>

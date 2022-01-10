@@ -1,0 +1,132 @@
+@use 'app/scss/variables/colors'as colors;
+
+:host {
+
+    // Reset
+    * {
+
+        &,
+        &:before,
+        &:after {
+            box-sizing: border-box;
+        }
+    }
+
+    margin-bottom: 0.7rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    .tile {
+        flex: 0 1 auto;
+    }
+
+    .range {
+        flex: 1000 1 auto;
+        -webkit-appearance: none;
+        height: 3px;
+        background: colors.$fg-secondary;
+        border-radius: 1px;
+        outline: none;
+        padding: 0;
+        margin: 0 1rem; // Range Handle
+
+        &::-webkit-slider-thumb {
+            background: #90CAF9;
+            width: 1rem;
+            height: 1rem;
+            appearance: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background .15s ease-in-out, width .25s ease-in-out, height .25s ease-in-out;
+
+            &:hover {
+                background: colors.$bg-selected;
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+        }
+
+        &:active::-webkit-slider-thumb {
+            background: colors.$bg-selected;
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+
+        &::-moz-range-thumb {
+            background: #90CAF9;
+            width: 1rem;
+            height: 1rem;
+            border: 0;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background .15s ease-in-out, width .25s ease-in-out, height .25s ease-in-out;
+
+            &:hover {
+                background: colors.$bg-selected;
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+        }
+
+        &:active::-moz-range-thumb {
+            background: colors.$bg-selected;
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+    }
+
+    // Range Label
+    .value {
+        flex: 1 0 4rem;
+        line-height: 1.6rem;
+        text-align: center;
+        border-radius: 0.1rem;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.3rem 0.7rem;
+        word-wrap: normal;
+    }
+
+    // Firefox Overrides
+    input::-moz-focus-inner,
+    input::-moz-focus-outer {
+        border: 0;
+    }
+
+    ::-moz-range-track {
+        background: colors.$fg-secondary;
+        border: 0;
+    }
+
+    &[disabled="true"] {
+        opacity: 0.4;
+
+        #range {
+            &::-webkit-slider-thumb {
+                background: colors.$fg-secondary;
+
+                &:hover {
+                    background: colors.$fg-secondary;
+                    width: 1rem;
+                    height: 1rem;
+                }
+            }
+
+            &::-moz-range-thumb {
+                background: colors.$fg-secondary;
+
+                &:hover {
+                    background: colors.$fg-secondary;
+                    width: 1rem;
+                    height: 1rem;
+                }
+            }
+
+            ::-moz-range-track {
+                background: colors.$fg-secondary;
+                border: 0;
+            }
+        }
+    }
+}

@@ -1,0 +1,13 @@
+@use '../../variables/colors'as colors;
+
+@mixin custom-card() {
+    .mat-card {
+        background: rgba(0, 0, 0, 0.2);
+        color: inherit;
+
+        .mat-card-title,
+        .mat-card-subtitle {
+            color: colors.$fg-darker;
+        }
+    }
+}

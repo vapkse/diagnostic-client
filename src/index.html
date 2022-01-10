@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Diagnostic</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.2, maximum-scale=5.0, user-scalable=yes">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            background-color: #252D35;
+            color: #eee;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -5rem;
+            margin-left: -5rem;
+            opacity: 0.4;
+        }
+
+        .page-loader:after,
+        .page-loader:before {
+            content: '';
+            width: 10rem;
+            height: 10rem;
+            border-radius: 50%;
+            background-color: #7C9FAF;
+            opacity: 0.6;
+            position: absolute;
+            top: 0;
+            left: 0;
+            -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+            animation: sk-bounce 2.0s infinite ease-in-out;
+        }
+
+        .page-loader:before {
+            -webkit-animation-delay: -1.0s;
+            animation-delay: -1.0s;
+        }
+
+        @-webkit-keyframes sk-bounce {
+
+            0%,
+            100% {
+                -webkit-transform: scale(0.0)
+            }
+
+            50% {
+                -webkit-transform: scale(1.0)
+            }
+        }
+
+        @keyframes sk-bounce {
+
+            0%,
+            100% {
+                transform: scale(0.0);
+                -webkit-transform: scale(0.0);
+            }
+
+            50% {
+                transform: scale(1.0);
+                -webkit-transform: scale(1.0);
+            }
+        }
+    </style>
+</head>
+
+<body id="diagnostic">
+    <app-root>
+        <div class="page-loader"></div>
+    </app-root>
+</body>
+
+</html>
