@@ -15,7 +15,7 @@
             <div class="sub-title">Pictures</div>
             <div id="bg">
                 <span class="picture" *ngFor="let picture of amp.pictures" [style.max-width]="picture.width ? picture.width : '100%'">
-                    <img src="{{amp.picturesPath + picture.path}}">
+                    <img src="assets/{{amp.picturesPath + picture.path}}">
                     <div class="description" *ngIf="picture.description">{{picture.description}}</div>
                 </span>
             </div>
@@ -23,14 +23,14 @@
         <div class="sub-content" *ngIf="amp.schematics && amp.schematics.length">
             <div class="sub-title">Schematics</div>
             <span class="schematic" *ngFor="let schematic of amp.schematics" [style.max-width]="schematic.width ? schematic.width : '100%'">
-                <img src="{{amp.schematicsPath + schematic.path}}">
+                <img src="assets/{{amp.schematicsPath + schematic.path}}">
                 <div class="description" *ngIf="schematic.description">{{schematic.description}}</div>
             </span>
         </div>
         <div class="sub-content" *ngIf="amp.measures && amp.measures.length">
             <div class="sub-title">Measures</div>
             <span class="measure" *ngFor="let measure of amp.measures" [style.max-width]="measure.width ? measure.width : '100%'">
-                <img src="{{amp.measuresPath + measure.path}}">
+                <img src="assets/{{amp.measuresPath + measure.path}}">
                 <div class="description" *ngIf="measure.description">{{measure.description}}</div>
             </span>
         </div>

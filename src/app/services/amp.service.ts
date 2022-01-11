@@ -42,9 +42,9 @@ export class AmpService {
             map(([serverUrl, noAdmin]) => !serverUrl.startsWith('https://') && !noAdmin)
         );
 
-        this.amplifierMap$ = this.httpClient.get<Record<string, AmpInfoInterface>>('https://diagnostic-e9ae3.firebaseio.com/amplist.json').pipe(
-            filter(json => !!json),
-            map(json => Object.keys(json).reduce((m, key) => m.set(+key, new AmpInfo(json[key])), new Map<number, AmpInfo>())),
+        this.amplifierMap$ = this.httpClient.get<{ amplist: Record<string, AmpInfoInterface> }>('assets/amplist.json').pipe(
+            filter(json => !!json?.amplist),
+            map(json => Object.keys(json.amplist).reduce((m, key) => m.set(+key, new AmpInfo(json.amplist[key])), new Map<number, AmpInfo>())),
             tap(amps => {
                 amps.forEach(amp => {
                     // Merge values with inherits if exists

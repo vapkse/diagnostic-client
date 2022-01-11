@@ -25,6 +25,11 @@
                                 "glob": "**/*",
                                 "input": "src/assets/",
                                 "output": "assets/"
+                            },
+                            {
+                                "glob": "**/*",
+                                "input": "node_modules/diagnostic-server/assets",
+                                "output": "assets/"
                             }
                         ],
                         "styles": [{
@@ -103,6 +108,11 @@
                             {
                                 "glob": "**/*",
                                 "input": "src/assets/",
+                                "output": "assets/"
+                            },
+                            {
+                                "glob": "**/*",
+                                "input": "node_modules/diagnostic-server/assets",
                                 "output": "assets/"
                             }
                         ]
