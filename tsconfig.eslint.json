@@ -10,6 +10,6 @@
     },
     "include": [
         "src/**/*.ts",
-        "e2e/**/*.ts"
+        "electron-app.ts"
     ]
 }
