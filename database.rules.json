@@ -1,6 +1,6 @@
 {
     "rules": {
-        ".read": "$uid === auth.uid",
+        ".read": "false",
         ".write": "false"
     }
 }
