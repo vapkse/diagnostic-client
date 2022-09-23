@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { IFormBuilder, IFormGroup } from '@rxweb/types';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { catchError, combineLatestWith, debounceTime, delay, filter, map, Observable, of, switchMap, take, tap, withLatestFrom } from 'rxjs';
 
 import { AmpInfo, FieldInfo, Slider, Toggle } from '../../common/amp';
@@ -14,17 +13,17 @@ interface SendRequestParams {
     value?: number;
 }
 
-interface SliderForm extends Slider {
-    value: number;
+interface SliderFormControls {
+    value: FormControl<number>;
 }
 
-interface ToogleForm extends Toggle {
-    value: boolean;
+interface ToogleFormControls {
+    value: FormControl<boolean>;
 }
 
-interface AmpParamsForm {
-    toggles: Array<ToogleForm>;
-    sliders: Array<SliderForm>;
+interface AmpParamsFormControls {
+    toggles: FormArray<FormGroup<ToogleFormControls>>;
+    sliders: FormArray<FormGroup<SliderFormControls>>;
 }
 
 @Component({
@@ -47,8 +46,7 @@ export class AmpParamsComponent {
     public params$: Observable<Map<string, unknown>>;
     public title$: Observable<string>;
 
-    public formParams$: Observable<IFormGroup<AmpParamsForm>>;
-    private formBuilder: IFormBuilder;
+    public formParams$: Observable<FormGroup<AmpParamsFormControls>>;
 
     private _ampInfo: AmpInfo;
 
@@ -67,11 +65,8 @@ export class AmpParamsComponent {
     public constructor(
         public ampParamsService: AmpParamsService,
         public ampService: AmpService,
-        private changeDetectorRef: ChangeDetectorRef,
-        formBuilder: FormBuilder
+        private changeDetectorRef: ChangeDetectorRef
     ) {
-        this.formBuilder = formBuilder;
-
         this.title$ = this.ampParamsService.ampInfo$.pipe(
             filter(ampInfo => !!ampInfo),
             combineLatestWith(ampService.isAdmin$),
@@ -79,13 +74,13 @@ export class AmpParamsComponent {
             shareReplayLast()
         );
 
-        const getValue = (params: Map<string, unknown>, name: string, factor: number): unknown => {
+        const getValue = (params: Map<string, unknown>, name: string, factor: number): number => {
             if (typeof params.get(name) !== 'number') {
                 console.log('Invalid name for getValue', name);
                 return 0;
             }
-            const value = params.get(name) as number;
-            return (factor !== 1 && Math.round(value * factor)) || params.get(name);
+            const value = +params.get(name);
+            return (factor !== 1 && Math.round(value * factor)) || value;
         };
 
         this.params$ = this.ampParamsService.currentParams$.pipe(
@@ -130,15 +125,19 @@ export class AmpParamsComponent {
                 this.waiter = true;
                 this.message = null;
 
-                const toogleFormArray = toggles.map(toggle => this.formBuilder.group<ToogleForm>({ ...toggle, value: params.size && this.getFlag(params, toggle.name, toggle.flag) } as ToogleForm));
-                const sliderFormArray = sliders.map(slider => this.formBuilder.group<SliderForm>({ ...slider, value: params.size && getValue(params, slider.name, slider.factor) } as SliderForm));
+                const toogleFormArray = toggles.map(toggle => new FormGroup<ToogleFormControls>({ value: new FormControl(params.size && this.getFlag(params, toggle.name, toggle.flag)) }));
+                const sliderFormArray = sliders.map(slider => new FormGroup<SliderFormControls>({ value: new FormControl(params.size && getValue(params, slider.name, slider.factor)) }));
 
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
-                sliderFormArray.filter(formGroup => formGroup.value.enabled === false).forEach(formGroup => formGroup.disable());
+                sliderFormArray.forEach((formControl, index) => {
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+                    if (sliders[index].enabled === false) {
+                        formControl.disable();
+                    }
+                });
 
-                const formParams = this.formBuilder.group<AmpParamsForm>({
-                    toggles: this.formBuilder.array(toogleFormArray),
-                    sliders: this.formBuilder.array(sliderFormArray)
+                const formParams = new FormGroup<AmpParamsFormControls>({
+                    toggles: new FormArray(toogleFormArray),
+                    sliders: new FormArray(sliderFormArray)
                 });
 
                 if (!isAdmin) {
@@ -153,14 +152,15 @@ export class AmpParamsComponent {
         const toogleFormArrayChange$ = formParams$.pipe(
             switchMap(formParams => formParams.controls.toggles.valueChanges),
             map(toogleFormGroup => Array.from(toogleFormGroup)),
-            withLatestFrom(this.params$),
-            switchMap(([toogleFormGroup, params]) => {
-                const setFlag$ = (index: number): Observable<IFormGroup<AmpParamsForm>> => {
+            withLatestFrom(this.params$, this.toggles$),
+            switchMap(([toogleFormGroup, params, toggles]) => {
+                const setFlag$ = (index: number): Observable<FormGroup<AmpParamsFormControls>> => {
                     if (index >= toogleFormGroup.length) {
-                        return of(undefined as IFormGroup<AmpParamsForm>);
+                        return of(undefined as FormGroup<AmpParamsFormControls>);
                     }
 
-                    const toggle = toogleFormGroup[index];
+                    const toggle = toggles[index];
+                    const value = toogleFormGroup[index].value;
                     const currentValue = params.get(toggle.name);
 
                     if (typeof currentValue !== 'number') {
@@ -169,7 +169,7 @@ export class AmpParamsComponent {
                     }
                     const flags = params.get(toggle.name) as number;
                     // eslint-disable-next-line no-bitwise
-                    const nextValue = toggle.value ? flags | toggle.flag : flags & ~toggle.flag;
+                    const nextValue = value ? flags | toggle.flag : flags & ~toggle.flag;
 
                     if (nextValue === currentValue) {
                         // No changes
@@ -188,17 +188,18 @@ export class AmpParamsComponent {
         const sliderFormArrayChange$ = formParams$.pipe(
             switchMap(formParams => formParams.controls.sliders.valueChanges),
             map(sliderFormGroup => Array.from(sliderFormGroup)),
-            withLatestFrom(this.params$),
-            switchMap(([sliderFormGroup, params]) => {
-                const setFlag$ = (index: number): Observable<IFormGroup<AmpParamsForm>> => {
+            withLatestFrom(this.params$, this.sliders$),
+            switchMap(([sliderFormGroup, params, sliders]) => {
+                const setFlag$ = (index: number): Observable<FormGroup<AmpParamsFormControls>> => {
                     if (index >= sliderFormGroup.length) {
-                        return of(undefined as IFormGroup<AmpParamsForm>);
+                        return of(undefined as FormGroup<AmpParamsFormControls>);
                     }
 
-                    const slider = sliderFormGroup[index];
+                    const slider = sliders[index];
+                    const value = sliderFormGroup[index].value;
                     const currentValue = params.get(slider.name);
 
-                    let nextValue = slider.value;
+                    let nextValue = value;
                     if (slider.factor !== 1) {
                         nextValue = Math.round(nextValue / slider.factor);
                     }

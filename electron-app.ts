@@ -152,7 +152,7 @@ ready$.pipe(
                     { role: 'minimize' }
                 ]
             }
-        ] as MenuItemConstructorOptions[];
+        ] as Array<MenuItemConstructorOptions>;
 
         const menu = Menu.buildFromTemplate(template);
         Menu.setApplicationMenu(menu);
