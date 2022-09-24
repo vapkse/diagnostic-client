@@ -38,7 +38,7 @@ export class AmpParamsComponent {
     public params$: Observable<Map<string, unknown>>;
     public title$: Observable<string>;
 
-    public formParams$: Observable<FormGroup<AmpParamsFormControls>>;
+    public form$: Observable<FormGroup<AmpParamsFormControls>>;
 
     private _ampInfo?: AmpInfo;
 
@@ -113,7 +113,7 @@ export class AmpParamsComponent {
             shareReplayLast()
         );
 
-        const formParams$ = this.ampParamsService.currentParams$.pipe(
+        const form$ = this.ampParamsService.currentParams$.pipe(
             filter(Boolean),
             combineLatestWith(this.sliders$, this.toggles$, ampService.isAdmin$),
             map(([params, sliders, toggles, isAdmin]) => {
@@ -144,7 +144,7 @@ export class AmpParamsComponent {
             shareReplayLast()
         );
 
-        const toogleFormArrayChange$ = formParams$.pipe(
+        const toogleFormArrayChange$ = form$.pipe(
             switchMap(formParams => formParams.controls.toggles.valueChanges),
             withLatestFrom(this.params$, this.toggles$),
             switchMap(([values, params, toggles]) => {
@@ -180,7 +180,7 @@ export class AmpParamsComponent {
             })
         );
 
-        const sliderFormArrayChange$ = formParams$.pipe(
+        const sliderFormArrayChange$ = form$.pipe(
             switchMap(formParams => formParams.controls.sliders.valueChanges),
             withLatestFrom(this.params$, this.sliders$),
             switchMap(([values, params, sliders]) => {
@@ -212,7 +212,7 @@ export class AmpParamsComponent {
             })
         );
 
-        this.formParams$ = formParams$.pipe(
+        this.form$ = form$.pipe(
             subscribeWith(sliderFormArrayChange$, toogleFormArrayChange$),
             tap(() => {
                 this.waiter = false;
@@ -253,7 +253,6 @@ export class AmpParamsComponent {
             return ensureStates$().pipe(
                 debounceTime(300),
                 switchMap(() => this.ampParamsService.sendRequest$(request.action, request.value || 0)),
-                take(1),
                 catchError((err: unknown) => {
                     if (typeof err === 'object') {
                         const error = err as Record<string, unknown>;
@@ -272,6 +271,7 @@ export class AmpParamsComponent {
                     }
                     return ensureStates$();
                 }),
+                take(1),
                 delay(1),
                 tap(() => {
                     this.waiter = false;

@@ -82,9 +82,9 @@ export class AmpParamsService {
     }
 
     public sendRequest$(action: string, val?: number): Observable<number | undefined> {
-        const request = AmpParamsRequest.get('getParams');
+        const request = AmpParamsRequest.get(action);
         if (request === undefined) {
-            return throwError(() => new Error('getParams return undefined'));
+            return throwError(() => new Error(`request for action ${action} not found`));
         }
 
         return this.ampInfo$.pipe(

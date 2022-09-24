@@ -109,7 +109,7 @@ export class AmpControlsComponent extends DestroyDirective {
         this.snackBar.openFromTemplate(this.snackBarTemplate, {
             duration: message.duration,
             data: message,
-            panelClass: ['message-template', message.type || '']
+            panelClass: message.type ? ['message-template', message.type] : ['message-template']
         });
     }
 }

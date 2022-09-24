@@ -22,7 +22,7 @@ export class AppComponent extends DestroyDirective {
     public sideNav?: MatSidenavContainer;
 
     public socketIoScript?: HTMLScriptElement;
-    public select$ = new Subject<number>();
+    public select$ = new Subject<number | undefined>();
 
     public constructor(
         public ampService: AmpService,

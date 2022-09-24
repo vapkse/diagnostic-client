@@ -22,7 +22,7 @@ export enum Statuses {
 export class AmpService {
     public serverUrl$ = new ReplaySubject<string>(1);
     public selectedId$ = new BehaviorSubject<number | undefined>(undefined);
-    public currentParamsAmpInfo$ = new Subject<AmpInfo>();
+    public currentParamsAmpInfo$ = new Subject<AmpInfo | undefined>();
     public noAdmin$ = new BehaviorSubject<boolean>(false);
 
     public selectedAmp$: Observable<AmpInfo | undefined>;

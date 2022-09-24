@@ -1,15 +1,15 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { ChangeDetectorRef, Component, ElementRef, HostBinding, Input, Optional, Self, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, Input, Optional, Self, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { debounceTime, fromEvent, map, mergeWith, of, ReplaySubject, Subject, switchMap, takeUntil, tap, timer, withLatestFrom } from 'rxjs';
 
 import { DestroyDirective } from '../../destroy/destroy.directive';
 
-// eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
     selector: 'fslider',
     templateUrl: './fslider.component.html',
-    styleUrls: ['./fslider.component.scss']
+    styleUrls: ['./fslider.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FSliderComponent extends DestroyDirective implements ControlValueAccessor {
     @Input() public min = 0;

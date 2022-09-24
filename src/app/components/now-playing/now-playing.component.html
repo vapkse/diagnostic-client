@@ -1,1 +1,3 @@
-<now-playing-artist *ngFor="let artist of nowPlaying.artistsInfos" [artist]="artist"></now-playing-artist>
+<ng-container *ngIf="nowPlaying?.artistsInfos">
+    <now-playing-artist *ngFor="let artist of nowPlaying?.artistsInfos" [artist]="artist"></now-playing-artist>
+</ng-container>

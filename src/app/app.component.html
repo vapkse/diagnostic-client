@@ -2,7 +2,7 @@
     <mat-sidenav #sidenav position="start" id="sidenav-start">
         <mat-nav-list>
             <ul class="items">
-                <li [class.selected]="(ampService.selectedId$ | async) === null" (click)="select$.next(null)">
+                <li [class.selected]="(ampService.selectedId$ | async) === null" (click)="select$.next(undefined)">
                     <span class="id">&nbsp;</span>
                     <span mat-list-item>Online Amps</span>
                 </li>
@@ -29,7 +29,7 @@
             <router-outlet></router-outlet>
         </div>
     </div>
-    <mat-sidenav #sidefn position="end" id="sidenav-end" [opened]="!!(ampService.currentParamsAmpInfo$ | async)" (closed)="ampService.currentParamsAmpInfo$.next(null)">
-        <amp-params id="params-wrapper" [ampInfo]="ampService.currentParamsAmpInfo$ | async"></amp-params>
+    <mat-sidenav #sidefn position="end" id="sidenav-end" [opened]="!!(ampService.currentParamsAmpInfo$ | async)" (closed)="ampService.currentParamsAmpInfo$.next(undefined)">
+        <amp-params *ngIf="ampService.currentParamsAmpInfo$ | async as ampInfo" id="params-wrapper" [ampInfo]="ampInfo"></amp-params>
     </mat-sidenav>
 </mat-sidenav-container>

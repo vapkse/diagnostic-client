@@ -6,18 +6,18 @@
     <div class="lds-ripple"> </div>
 </div>
 <ng-container *ngIf="ampInfo">
-    <form id="params-panel" *ngIf="formParams$ | async as formGroup" [formGroup]="formGroup" [attr.admin]="ampService.isAdmin$ | async">
+    <form id="params-panel" *ngIf="form$ | async as form" [formGroup]="form" [attr.admin]="ampService.isAdmin$ | async">
         <div id="amp-title" *ngIf="title$ | async as title" class="flex-row">{{ title }}</div>
         <div class="flex-row" id="toggles" formArrayName="toggles">
-            <ng-container *ngFor="let toggle of toggles$ | async; let ti=index" [formGroupName]="ti">
-                <mat-slide-toggle formControlName="value">
+            <ng-container *ngFor="let toggle of toggles$ | async; let ti=index">
+                <mat-slide-toggle [formControlName]="ti">
                     {{ toggle.title }}
                 </mat-slide-toggle>
             </ng-container>
         </div>
         <div class="flex-row" id="sliders" formArrayName="sliders">
-            <ng-container *ngFor="let slider of sliders$ | async; let si=index" [formGroupName]="si">
-                <fslider formControlName="value" [attr.disabed]="slider.enabled === false" [title]="slider.title" [step]="slider.step || 1" [min]="slider.min || 0" [max]="slider.max || 255"></fslider>
+            <ng-container *ngFor="let slider of sliders$ | async; let si=index">
+                <fslider [formControlName]="si" [attr.disabed]="slider.enabled === false" [title]="slider.title" [step]="slider.step || 1" [min]="slider.min || 0" [max]="slider.max || 255"></fslider>
             </ng-container>
         </div>
         <div class="flex-row" *ngIf="ampService.isAdmin$ | async">

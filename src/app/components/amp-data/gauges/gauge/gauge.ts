@@ -151,14 +151,14 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
                         str.push(String(range.a));
                     }
                     str.push(')');
-                } else if (range.max !== undefined && range.a2 !== undefined && range.h1 !== undefined && range.s1 !== undefined && range.l1 !== undefined && range.h2 !== undefined && range.s2 !== undefined && range.l2 !== undefined) {
+                } else if (range.max !== undefined && range.h1 !== undefined && range.s1 !== undefined && range.l1 !== undefined && range.h2 !== undefined && range.s2 !== undefined && range.l2 !== undefined) {
                     const min = range.min || 0;
                     const f = (value - min) / (range.max - min);
                     const h = Math.round(range.h1 + f * (range.h2 - range.h1));
                     const s = Math.round(range.s1 + f * (range.s2 - range.s1));
                     const l = Math.round(range.l1 + f * (range.l2 - range.l1));
                     let a = 0;
-                    if (range.a1) {
+                    if (range.a1 && range.a2) {
                         a = Math.round(range.a1 + f * (range.a2 - range.a1));
                     }
                     str.push(a ? 'hsla(' : 'hsl(');
