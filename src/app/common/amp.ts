@@ -261,8 +261,8 @@ export interface AmpInfoMeasure {
 export type ControlPanelTypes = 'reset' | 'resetModulation' | 'stop';
 
 export interface AmpInfoInterface {
+    id: number;
     name?: string;
-    id?: number;
     description?: string;
     dampingfactor?: number;
     power?: string;
@@ -312,7 +312,7 @@ export class AmpInfo implements AmpInfoInterface {
         return this.values?.name;
     }
 
-    public get id(): number | undefined {
+    public get id(): number {
         return this.values?.id;
     }
 
@@ -384,8 +384,8 @@ export class AmpInfo implements AmpInfoInterface {
         return this.values?.visible;
     }
 
-    public get paramsInfos(): ReadonlyArray<FieldInfo> | undefined {
-        return this.values?.paramsInfos;
+    public get paramsInfos(): ReadonlyArray<FieldInfo> {
+        return this.values?.paramsInfos || new Array<FieldInfo>();
     }
 
     public get paramsPanelTitle(): string | undefined {

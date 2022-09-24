@@ -49,7 +49,7 @@ export abstract class GaugeOptions {
     public refTextSize = 14;
     public refColor: ColorTypes = 'black';
     public valueColor: ColorTypes = 'black';
-    public title: string;
+    public title = '';
     public titleTextSize = 14;
     public titleTextColor: ColorTypes = 'black';
     public limits: ReadonlyArray<number> = new Array<number>(); // Array of limits indicators
@@ -62,7 +62,7 @@ export abstract class GaugeOptions {
 @Directive()
 export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective {
     protected element: HTMLElement;
-    private canvas: HTMLCanvasElement;
+    private canvas?: HTMLCanvasElement;
     private requestAnimationId = 0;
     private animationLastTime = 0;
     private currentValue = 0;
@@ -111,7 +111,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
         }
     }
 
-    protected getColor(colorName: string, value?: number): string {
+    protected getColor(colorName: string, value: number): string {
         if (this.options.error && colorName !== 'backgroundColor') {
             return this.options.errorColor;
         }
@@ -151,13 +151,13 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
                         str.push(String(range.a));
                     }
                     str.push(')');
-                } else if (range.h1 !== undefined && range.s1 !== undefined && range.l1 !== undefined && range.h2 !== undefined && range.s2 !== undefined && range.l2 !== undefined) {
+                } else if (range.max !== undefined && range.a2 !== undefined && range.h1 !== undefined && range.s1 !== undefined && range.l1 !== undefined && range.h2 !== undefined && range.s2 !== undefined && range.l2 !== undefined) {
                     const min = range.min || 0;
                     const f = (value - min) / (range.max - min);
                     const h = Math.round(range.h1 + f * (range.h2 - range.h1));
                     const s = Math.round(range.s1 + f * (range.s2 - range.s1));
                     const l = Math.round(range.l1 + f * (range.l2 - range.l1));
-                    let a: number;
+                    let a = 0;
                     if (range.a1) {
                         a = Math.round(range.a1 + f * (range.a2 - range.a1));
                     }
@@ -187,14 +187,14 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
 
     protected getText(textName: string, value?: number): string {
         const text = this.options[textName] as StringFn | string;
-        if (typeof text === 'function') {
+        if (typeof text === 'function' && value !== undefined) {
             const val = text(value);
             if (val) {
                 return val;
             }
         }
 
-        return text?.toString() || (!isNaN(value) ? `${Math.floor(value / 100 * 100)}%` : '');
+        return text?.toString() || (value !== undefined && !isNaN(value) ? `${Math.floor(value / 100 * 100)}%` : '');
     }
 
     protected animate(): void {
@@ -209,7 +209,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
         const refMatch = !hasRef || Math.abs(this.currentRef - this.options.reference) < 0.01;
 
         if (!hasValue) {
-            this.currentValue = null;
+            this.currentValue = 0;
         } else if (valueMatch) {
             this.currentValue = this.options.value;
         } else if (this.options.value < this.currentValue) {
@@ -225,7 +225,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
         }
 
         if (!hasRef) {
-            this.currentRef = null;
+            this.currentRef = 0;
         } else if (refMatch) {
             this.currentRef = this.options.reference;
         } else if (this.options.reference < this.currentRef) {
@@ -256,6 +256,10 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
 
         this.canvas = this.canvas || this.element.firstElementChild as HTMLCanvasElement;
         const ctx = this.canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Fail to create canvas');
+            return;
+        }
 
         // dimensions
         const width = this.canvas.width = this.element.clientWidth;
@@ -265,7 +269,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
         }
 
         // Position function for horizontal layout
-        let getPos: NumberFn;
+        let getPos: NumberFn | undefined;
         if (this.options.style !== 'circular') {
             getPos = (value: number): number => this.options.style === 'horizontal' ? halfLineWidth + (width - 2 * halfLineWidth) * value / 100 : height - (halfLineWidth + (height - 2 * halfLineWidth) * value / 100);
         }
@@ -276,15 +280,15 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
         // Measure text's size
         const valueText = this.getText('valueText', this.currentValue);
         ctx.font = `${this.options.valueTextSize}px titilliumregular`;
-        const valueTextWidth = valueText && ctx.measureText(valueText).width;
+        const valueTextWidth = valueText && ctx.measureText(valueText).width || 0;
 
         const titleText = this.getText('title');
         ctx.font = `${this.options.titleTextSize}px titilliumregular`;
-        const titleTextWidth = titleText && ctx.measureText(titleText).width;
+        const titleTextWidth = titleText && ctx.measureText(titleText).width || 0;
 
         const refText = this.getText('refText', this.currentRef);
         ctx.font = `${this.options.refTextSize}px bebas`;
-        const refTextWidth = refText && ctx.measureText(refText).width;
+        const refTextWidth = refText && ctx.measureText(refText).width || 0;
 
         // Background
         let lineWidth = 0;
@@ -318,7 +322,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
         ctx.stroke();
 
         const valueColor = this.getColor('valueColor', this.currentValue);
-        const valuePos = getPos?.(this.currentValue);
+        const valuePos = getPos?.(this.currentValue) || 0;
         if (!isNaN(this.currentValue)) {
             ctx.beginPath();
             switch (this.options.style) {
@@ -356,13 +360,13 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
             switch (this.options.style) {
                 case 'horizontal':
                     ctx.textBaseline = 'bottom';
-                    valueTextPos = valueText && Math.min(Math.max(0, (valuePos || 0) - valueTextWidth / 2), width - valueTextWidth);
+                    valueTextPos = valueText && Math.min(Math.max(0, (valuePos || 0) - valueTextWidth / 2), width - valueTextWidth) || 0;
                     ctx.fillText(valueText, valueTextPos, height - lineWidth - 2);
                     break;
 
                 case 'vertical':
                     ctx.textBaseline = 'middle';
-                    valueTextPos = valueText && Math.min(Math.max(this.options.valueTextSize / 2, valuePos || 0), height - this.options.valueTextSize / 2);
+                    valueTextPos = valueText && Math.min(Math.max(this.options.valueTextSize / 2, valuePos || 0), height - this.options.valueTextSize / 2) || 0;
                     ctx.fillText(valueText, lineWidth + 10, valueTextPos);
                     break;
 
@@ -374,7 +378,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
         }
 
         if (titleText) {
-            ctx.fillStyle = this.getColor('titleTextColor');
+            ctx.fillStyle = this.getColor('titleTextColor', 0);
             ctx.font = `${this.options.titleTextSize}px titilliumregular`;
             switch (this.options.style) {
                 case 'horizontal':
@@ -396,9 +400,10 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
             }
         }
 
-        let refColor: string;
-        if (this.options.refLineWidth && !isNaN(this.currentRef)) {
-            refColor = this.getColor('refColor', this.currentRef);
+        let refColor = '';
+        const currentRef = this.currentRef;
+        if (this.options.refLineWidth && currentRef !== undefined && !isNaN(currentRef)) {
+            refColor = this.getColor('refColor', currentRef);
             ctx.beginPath();
             ctx.strokeStyle = refColor;
             const refLineWidth = ctx.lineWidth = this.options.refLineWidth;
@@ -408,14 +413,14 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
             switch (this.options.style) {
                 case 'horizontal':
                     ctx.lineCap = 'square';
-                    x = getPos(this.currentRef);
+                    x = getPos?.(currentRef) || 0;
                     ctx.moveTo(x, height - lineWidth + refLineWidth / 2);
                     ctx.lineTo(x, height - refLineWidth / 2);
                     break;
 
                 case 'vertical':
                     ctx.lineCap = 'square';
-                    y = getPos(this.currentRef);
+                    y = getPos?.(this.currentRef) || 0;
                     ctx.moveTo(refLineWidth / 2, y);
                     ctx.lineTo(lineWidth - refLineWidth / 2, y);
                     break;
@@ -431,7 +436,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
         }
 
         if (refText) {
-            refColor = refColor || this.getColor('refColor', this.currentRef);
+            refColor ||= this.getColor('refColor', this.currentRef);
             ctx.beginPath();
             ctx.strokeStyle = refColor;
             ctx.font = `${this.options.refTextSize}px bebas`;
@@ -464,7 +469,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
                     case 'horizontal':
                         ctx.lineWidth = 3;
                         ctx.lineCap = 'square';
-                        x = getPos(limit);
+                        x = getPos?.(limit) || 0;
                         ctx.moveTo(x, height - lineWidth + 2);
                         ctx.lineTo(x, height - 2);
                         break;
@@ -472,7 +477,7 @@ export abstract class GaugeBase<T extends GaugeOptions> extends DestroyDirective
                     case 'vertical':
                         ctx.lineWidth = 3;
                         ctx.lineCap = 'square';
-                        y = getPos(limit);
+                        y = getPos?.(limit) || 0;
                         ctx.moveTo(2, y);
                         ctx.lineTo(lineWidth - 2, y);
                         break;

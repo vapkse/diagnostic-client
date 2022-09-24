@@ -21,11 +21,11 @@ export enum Statuses {
 })
 export class AmpService {
     public serverUrl$ = new ReplaySubject<string>(1);
-    public selectedId$ = new BehaviorSubject<number>(null);
+    public selectedId$ = new BehaviorSubject<number | undefined>(undefined);
     public currentParamsAmpInfo$ = new Subject<AmpInfo>();
     public noAdmin$ = new BehaviorSubject<boolean>(false);
 
-    public selectedAmp$: Observable<AmpInfo>;
+    public selectedAmp$: Observable<AmpInfo | undefined>;
     public amplifiers$: Observable<ReadonlyArray<AmpInfo>>;
     public amplifierMap$: Observable<Map<number, AmpInfo>>;
     public isAdmin$: Observable<boolean>;
@@ -70,7 +70,7 @@ export class AmpService {
 
         // Create selected amp stream
         this.selectedAmp$ = combineLatest([this.selectedId$, this.amplifierMap$]).pipe(
-            map(([selectedId, amps]) => selectedId && amps.get(selectedId))
+            map(([selectedId, amps]) => selectedId && amps.get(selectedId) || undefined)
         );
 
         // Create socketio stream
@@ -78,7 +78,7 @@ export class AmpService {
             filter(() => typeof io !== 'undefined'),
             take(1),
             map(() => io),
-            tap(socketIo => this.consolelog(socketIo ? 'Socket io ready.' : 'Socket io fail.'))
+            tap(() => this.consolelog('Socket io ready.'))
         );
 
         // Create socket stream
@@ -110,7 +110,7 @@ export class AmpService {
 
         this.ampStatusMap$ = this.ampData$.pipe(
             mergeWith(interval(5000).pipe(
-                map(() => null as AmpRequestResponse)
+                map(() => ({} as AmpRequestResponse))
             )),
             switchMap(ampData => this.ampStatusMap$.pipe(
                 withLatestFrom(this.amplifierMap$),
@@ -127,7 +127,7 @@ export class AmpService {
                             statusText: 'online',
                             port: ampData.port,
                             lastseen: Date.now(),
-                            interval: getTick(ampData.datas?.tick),
+                            interval: ampData.datas?.tick ? getTick(ampData.datas.tick) : undefined,
                             flags: ampData.datas?.ctrlflags && ampData.datas.ctrlflags === 3,
                             master: amp?.master,
                             inherits: amp?.inherits
@@ -170,10 +170,10 @@ export class AmpService {
                         return m;
                     }, new Map<number, AmpStatus>());
 
-                    return statusUpdated ? newStatusMap : null;
+                    return statusUpdated ? newStatusMap : undefined;
                 })
             )),
-            filter(statuses => !!statuses),
+            filter(Boolean),
             startWith(new Map<number, AmpStatus>()),
             shareReplayLast()
         );

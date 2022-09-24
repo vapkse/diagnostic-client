@@ -19,7 +19,7 @@ export class AppConfigService {
         httpClient: HttpClient
     ) {
         this.appConfig$ = httpClient.get<AppConfig>('assets/config.json').pipe(
-            catchError(() => of(null as AppConfig)),
+            catchError(() => of({} as AppConfig)),
             shareReplayLast()
         );
     }

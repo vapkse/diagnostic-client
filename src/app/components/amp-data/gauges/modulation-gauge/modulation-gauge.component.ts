@@ -24,8 +24,8 @@ export class ModulationGaugeOptions extends GaugeOptions {
     template: '<canvas class="gauge"></canvas>'
 })
 export class ModulationGaugeComponent extends GaugeBase<ModulationGaugeOptions> implements OnChanges, OnInit {
-    @Input() public datas: AmpDataHeader;
-    @Input() public modFactor: number;
+    @Input() public datas?: AmpDataHeader;
+    @Input() public modFactor?: number;
     @Input() public tick = 0;
 
     protected options = new ModulationGaugeOptions();
@@ -34,9 +34,15 @@ export class ModulationGaugeComponent extends GaugeBase<ModulationGaugeOptions> 
     private modKey = 'mod' as keyof AmpDataHeader;
 
     public refresh(): void {
-        const value = this.datas[this.modKey] as number;
+        const datas = this.datas;
+        const data = this.datas?.[this.modKey];
+        if (!datas || data === undefined) {
+            return;
+        }
+
+        const value = data as number;
         this.options.value = Math.min(100, value * 100 * (this.modFactor || 1) / 255);
-        this.options.limits = Object.keys(this.datas.modlimits).map(key => Math.min(100, this.datas.modlimits[key] * 100 * (this.modFactor || 1) / 255));
+        this.options.limits = datas.modlimits ? Object.keys(datas.modlimits).map(key => Math.min(100, (datas.modlimits?.[key] || 0) * 100 * (this.modFactor || 1) / 255)) : new Array<number>();
         this.startAnimation();
     }
 

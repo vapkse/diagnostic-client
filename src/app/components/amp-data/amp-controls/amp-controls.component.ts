@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, TemplateRef, ViewChild, View
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, debounceTime, delay, filter, map, mergeWith, Observable, of, startWith, Subject, switchMap, take, takeUntil } from 'rxjs';
 
-import { AmpInfo, AmpParamsRequest, AmpResponse } from '../../../common/amp';
+import { AmpInfo, AmpParamsRequest } from '../../../common/amp';
 import { shareReplayLast } from '../../../common/custom-operators';
 import { AmpService } from '../../../services';
 import { DestroyDirective } from '../../destroy/destroy.directive';
@@ -19,10 +19,10 @@ class Message {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AmpControlsComponent extends DestroyDirective {
-    @Input() public ampInfo: AmpInfo;
+    @Input() public ampInfo?: AmpInfo;
 
     @ViewChild('snackBarTemplate', { static: false })
-    private snackBarTemplate: TemplateRef<unknown>;
+    private snackBarTemplate?: TemplateRef<unknown>;
 
     public reset$ = new Subject<void>();
     public action$ = new Subject<string>();
@@ -61,24 +61,37 @@ export class AmpControlsComponent extends DestroyDirective {
 
         this.action$.pipe(
             mergeWith(sendReset$),
-            switchMap(action => this.ampService.sendRequest$(this.ampInfo.id, AmpParamsRequest.get(action)).pipe(
-                take(1),
-                catchError((err: unknown) => {
-                    let message: string;
-                    const error = err as Record<string, unknown>;
-                    if (typeof error === 'object') {
-                        message = Object.keys(error)
-                            .filter(key => typeof error[key] === 'string')
-                            .map(key => `${key}: ${error[key] as string}`)
-                            .join('\n');
-                    } else {
-                        message = err as string;
-                    }
+            switchMap(action => {
+                if (!this.ampInfo) {
+                    this.showMessage(new Message('AmpInfos not available', 30000, 'danger'));
+                    return of(undefined);
+                }
 
-                    this.showMessage(new Message(message, 30000, 'danger'));
-                    return of(null as AmpResponse);
-                })
-            )),
+                const request = AmpParamsRequest.get(action);
+                if (!request) {
+                    this.showMessage(new Message('Invalid request', 30000, 'danger'));
+                    return of(undefined);
+                }
+
+                return this.ampService.sendRequest$(this.ampInfo.id, request).pipe(
+                    take(1),
+                    catchError((err: unknown) => {
+                        let message: string;
+                        const error = err as Record<string, unknown>;
+                        if (typeof error === 'object') {
+                            message = Object.keys(error)
+                                .filter(key => typeof error[key] === 'string')
+                                .map(key => `${key}: ${error[key] as string}`)
+                                .join('\n');
+                        } else {
+                            message = err as string;
+                        }
+
+                        this.showMessage(new Message(message, 30000, 'danger'));
+                        return of(undefined);
+                    })
+                );
+            }),
             takeUntil(this.destroyed$)
         ).subscribe(response => {
             if (response) {
@@ -88,10 +101,15 @@ export class AmpControlsComponent extends DestroyDirective {
     }
 
     private showMessage(message: Message): void {
+        if (!this.snackBarTemplate) {
+            console.error(message);
+            return;
+        }
+
         this.snackBar.openFromTemplate(this.snackBarTemplate, {
             duration: message.duration,
             data: message,
-            panelClass: ['message-template', message.type]
+            panelClass: ['message-template', message.type || '']
         });
     }
 }

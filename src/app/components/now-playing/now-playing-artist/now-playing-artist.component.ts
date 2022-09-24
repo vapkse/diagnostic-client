@@ -13,7 +13,7 @@ import { DestroyDirective } from '../../destroy/destroy.directive';
 })
 export class NowPlayingArtistComponent extends DestroyDirective {
     @Input()
-    public artist: Artist;
+    public artist?: Artist;
 
     public constructor(
         public nowPlayingService: NowPlayingService
@@ -22,7 +22,7 @@ export class NowPlayingArtistComponent extends DestroyDirective {
     }
 
     public openInNewTab(url: string): void {
-        window.open(url, '_blank').focus();
+        void window.open(url, '_blank')?.focus();
     }
 
     public trackBy(_index: number, webSite: WebSite): string {

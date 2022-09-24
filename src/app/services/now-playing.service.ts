@@ -28,7 +28,7 @@ export class NowPlayingService {
             filter(() => typeof io !== 'undefined'),
             take(1),
             map(() => io),
-            tap(socketIo => this.consolelog(socketIo ? 'Socket io ready.' : 'Socket io fail.'))
+            tap(() => this.consolelog('Socket io ready.'))
         );
 
         // Create socket stream

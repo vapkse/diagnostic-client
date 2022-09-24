@@ -23,7 +23,7 @@ export class StepindicatorOptions {
     public labelTextSize = 14;
     public progressSize = 40;
     public speed = 0.1;
-    public steps: Map<number, StepindicatorStep>;
+    public steps = new Map<number, StepindicatorStep>();
     public stepMaxTime = 0;
     public stepElapsedTime = 0;
     public stepMaxValue = 0;
@@ -36,17 +36,16 @@ export class StepindicatorOptions {
     selector: 'step-indicator',
     template: '<canvas class="step-indicator"></canvas>'
 })
-
 export class StepIndicatorComponent implements OnChanges, OnInit {
     @Input() public value = 0;
     @Input() public maxValue = 0;
     @Input() public elapsedTime = 0;
     @Input() public maxTime = 0;
     @Input() public stepIndex = 0;
-    @Input() public steps: Map<number, StepInfo>;
-    @Input() public error: string;
-    private canvas: HTMLCanvasElement;
-    private options: StepindicatorOptions;
+    @Input() public steps = new Map<number, StepInfo>();
+    @Input() public error?: string;
+    private canvas?: HTMLCanvasElement;
+    private options = new StepindicatorOptions();
     private element: HTMLElement;
     private requestAnimationId = 0;
     private animationLastTime = 0;
@@ -62,7 +61,6 @@ export class StepIndicatorComponent implements OnChanges, OnInit {
 
     public constructor(public el: ElementRef<HTMLElement>) {
         this.element = el.nativeElement;
-        this.options = new StepindicatorOptions();
     }
 
     public refresh(): void {
@@ -72,7 +70,7 @@ export class StepIndicatorComponent implements OnChanges, OnInit {
         const currentStep = this.options.stepIndex >= 0 && this.options.steps.get(this.options.stepIndex);
         if (currentStep) {
             if (currentStep.isError) {
-                currentStep.label = this.error;
+                currentStep.label = this.error || 'error';
             }
 
             // Calc previous steps percent
@@ -80,7 +78,7 @@ export class StepIndicatorComponent implements OnChanges, OnInit {
             let previousPercent = 0;
             // eslint-disable-next-line no-loops/no-loops
             while (--i >= 0) {
-                previousPercent += this.options.steps.has(i) && this.options.steps.get(i).range || 0;
+                previousPercent += this.options.steps.has(i) && this.options.steps.get(i)?.range || 0;
             }
 
             // Calc value progress in total percent
@@ -96,8 +94,10 @@ export class StepIndicatorComponent implements OnChanges, OnInit {
             }
 
             const step = this.options.steps.get(this.options.stepIndex);
-            step.maxTime = this.options.stepMaxTime;
-            step.maxValue = this.options.stepMaxValue;
+            if (step) {
+                step.maxTime = this.options.stepMaxTime;
+                step.maxValue = this.options.stepMaxValue;
+            }
         }
 
         this.startAnimation();
@@ -136,7 +136,7 @@ export class StepIndicatorComponent implements OnChanges, OnInit {
         const currentStep = this.stepIndex >= 0 && this.options.steps.get(this.stepIndex);
         const color = currentStep?.[colorName as StepIndicatorStepValues] as string || this.options[colorName as StepIndicatorOptionsValues] as string;
 
-        if (typeof color === 'function') {
+        if (typeof color === 'function' && value !== undefined) {
             const fn = color as (v: number) => string;
             return fn(value);
         }
@@ -169,6 +169,10 @@ export class StepIndicatorComponent implements OnChanges, OnInit {
 
         this.canvas = this.canvas || this.element.firstElementChild as HTMLCanvasElement;
         const ctx = this.canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Fail to create canvas');
+            return;
+        }
 
         // dimensions
         const width = this.canvas.width = this.element.clientWidth;
@@ -189,7 +193,7 @@ export class StepIndicatorComponent implements OnChanges, OnInit {
             // eslint-disable-next-line no-loops/no-loops
             while (++ii < stepMax) {
                 const step = this.options.steps.get(ii);
-                if (step?.range > 0) {
+                if (step && step.range > 0) {
                     if (this.currentPercentValue >= previousPercent && this.currentPercentValue < previousPercent + step.range) {
                         currentStep = step;
                         break;

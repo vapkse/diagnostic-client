@@ -7,7 +7,7 @@ import { AmpService } from '../services/amp.service';
 
 export class NavigationItem {
     public constructor(
-        public id?: number,
+        public id: number,
         public label?: string,
         public isOnline?: boolean,
         public maybeOnline?: boolean,
@@ -39,7 +39,7 @@ export class NavigationService {
                     const extendedStatusMap = new Map<number, AmpStatus>(ampStatusMap);
                     [...extendedStatusMap].forEach(([id, status]) => {
                         const ampInfo = amplifierMap.get(id);
-                        if (ampInfo.inherits) {
+                        if (ampInfo?.inherits) {
                             extendedStatusMap.set(ampInfo.inherits, status);
                         }
                     });

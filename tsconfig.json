@@ -18,8 +18,7 @@
         "noFallthroughCasesInSwitch": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "strictBindCallApply": true,
-        "strictFunctionTypes": true,
+        "strict": true,
         "noImplicitThis": true,
         "target": "es2020",
         "typeRoots": [

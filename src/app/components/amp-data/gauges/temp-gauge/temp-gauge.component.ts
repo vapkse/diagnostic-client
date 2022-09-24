@@ -10,7 +10,7 @@ export class TempGaugeOptions extends GaugeOptions {
         this.titleTextColor = '#ccc';
         this.valueLineWidth = 22;
         this.valueTextSize = 30;
-        this.limitsColor = null;
+        this.limitsColor = '';
         this.speed = 0.4;
         this.limits = [45, 80];
     }
@@ -23,7 +23,7 @@ export class TempGaugeOptions extends GaugeOptions {
 })
 export class TempGaugeComponent extends GaugeBase<TempGaugeOptions> implements OnChanges, OnInit {
     @Input() public value = 0;
-    @Input() public sensorInfos: TempSensorInfo;
+    @Input() public sensorInfos?: TempSensorInfo;
 
     protected options = new TempGaugeOptions();
 
@@ -59,6 +59,10 @@ export class TempGaugeComponent extends GaugeBase<TempGaugeOptions> implements O
     }
 
     public ngOnChanges(changes: { [propertyName: string]: SimpleChange }): void {
+        if (!this.sensorInfos) {
+            return;
+        }
+
         if (changes[this.valueKey]) {
             this.options.value = changes[this.valueKey].currentValue * (this.sensorInfos.factor || 1) + (this.sensorInfos.offset || 0);
         }
@@ -66,13 +70,22 @@ export class TempGaugeComponent extends GaugeBase<TempGaugeOptions> implements O
     }
 
     public ngOnInit(): void {
+        if (!this.sensorInfos) {
+            console.error('sensorInfos not available');
+            return;
+        }
+
         this.options.value = this.value * (this.sensorInfos.factor || 1) + (this.sensorInfos.offset || 0);
         this.refresh();
     }
 
     protected getText(textName: string, value?: number): string {
+        if (!this.sensorInfos) {
+            console.error('sensorInfos not available');
+            return '';
+        }
         if (textName === 'valueText') {
-            return !isNaN(this.options.value) ? `${Math.round(value)}${String.fromCharCode(0xB0, 0x43)}` : 'n.c.';
+            return value !== undefined && !isNaN(this.options.value) ? `${Math.round(value)}${String.fromCharCode(0xB0, 0x43)}` : 'n.c.';
         } else if (textName === 'title') {
             return this.sensorInfos.name;
         } else {

@@ -13,17 +13,9 @@ interface SendRequestParams {
     value?: number;
 }
 
-interface SliderFormControls {
-    value: FormControl<number>;
-}
-
-interface ToogleFormControls {
-    value: FormControl<boolean>;
-}
-
 interface AmpParamsFormControls {
-    toggles: FormArray<FormGroup<ToogleFormControls>>;
-    sliders: FormArray<FormGroup<SliderFormControls>>;
+    toggles: FormArray<FormControl<boolean | null>>;
+    sliders: FormArray<FormControl<number | null>>;
 }
 
 @Component({
@@ -40,7 +32,7 @@ export class AmpParamsComponent {
     @HostBinding('class.waiter')
     public waiter = true;
 
-    public message = null as string;
+    public message?: string;
     public sliders$: Observable<ReadonlyArray<Slider>>;
     public toggles$: Observable<ReadonlyArray<Toggle>>;
     public params$: Observable<Map<string, unknown>>;
@@ -48,17 +40,17 @@ export class AmpParamsComponent {
 
     public formParams$: Observable<FormGroup<AmpParamsFormControls>>;
 
-    private _ampInfo: AmpInfo;
+    private _ampInfo?: AmpInfo;
 
     @Input()
-    public set ampInfo(value: AmpInfo) {
+    public set ampInfo(value: AmpInfo | undefined) {
         this.waiter = true;
         this.changeDetectorRef.markForCheck();
 
         this.ampParamsService.ampInfo$.next(this._ampInfo = value);
     }
 
-    public get ampInfo(): AmpInfo {
+    public get ampInfo(): AmpInfo | undefined {
         return this._ampInfo;
     }
 
@@ -68,27 +60,29 @@ export class AmpParamsComponent {
         private changeDetectorRef: ChangeDetectorRef
     ) {
         this.title$ = this.ampParamsService.ampInfo$.pipe(
-            filter(ampInfo => !!ampInfo),
+            filter(Boolean),
             combineLatestWith(ampService.isAdmin$),
             map(([ampInfo, isAdmin]) => ampInfo.paramsPanelTitle || `${(ampInfo.name || '')} parameters${isAdmin ? '' : ' (read only)'}`),
             shareReplayLast()
         );
 
         const getValue = (params: Map<string, unknown>, name: string, factor: number): number => {
-            if (typeof params.get(name) !== 'number') {
+            const param = params.get(name);
+            if (param === undefined || typeof param !== 'number') {
                 console.log('Invalid name for getValue', name);
                 return 0;
             }
-            const value = +params.get(name);
-            return (factor !== 1 && Math.round(value * factor)) || value;
+            const value = +param;
+            return value ? (factor !== 1 && Math.round(value * factor)) || value : 0;
         };
 
         this.params$ = this.ampParamsService.currentParams$.pipe(
+            filter(Boolean),
             shareReplayLast()
         );
 
         this.sliders$ = ampParamsService.ampInfo$.pipe(
-            filter(ampInfo => !!ampInfo),
+            filter(Boolean),
             map(ampInfo => {
                 const createSlider = (info: FieldInfo): Slider => {
                     const sliderInfo = info.slider as Slider;
@@ -104,9 +98,9 @@ export class AmpParamsComponent {
         );
 
         this.toggles$ = ampParamsService.ampInfo$.pipe(
-            filter(ampInfo => !!ampInfo),
+            filter(Boolean),
             map(ampInfo => {
-                const createToggles = (info: FieldInfo): ReadonlyArray<Toggle> => info.toggles.map(t => {
+                const createToggles = (info: FieldInfo): ReadonlyArray<Toggle> => (info.toggles || new Array<Toggle>()).map(t => {
                     const toggleInfo = t as Toggle;
                     toggleInfo.name = info.name;
                     return toggleInfo;
@@ -120,13 +114,14 @@ export class AmpParamsComponent {
         );
 
         const formParams$ = this.ampParamsService.currentParams$.pipe(
+            filter(Boolean),
             combineLatestWith(this.sliders$, this.toggles$, ampService.isAdmin$),
             map(([params, sliders, toggles, isAdmin]) => {
                 this.waiter = true;
-                this.message = null;
+                this.message = undefined;
 
-                const toogleFormArray = toggles.map(toggle => new FormGroup<ToogleFormControls>({ value: new FormControl(params.size && this.getFlag(params, toggle.name, toggle.flag)) }));
-                const sliderFormArray = sliders.map(slider => new FormGroup<SliderFormControls>({ value: new FormControl(params.size && getValue(params, slider.name, slider.factor)) }));
+                const toogleFormArray = toggles.map(toggle => new FormControl(params.size && this.getFlag(params, toggle.name, toggle.flag) || false));
+                const sliderFormArray = sliders.map(slider => new FormControl(params.size && getValue(params, slider.name, slider.factor || 1) || null));
 
                 sliderFormArray.forEach((formControl, index) => {
                     // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
@@ -151,16 +146,15 @@ export class AmpParamsComponent {
 
         const toogleFormArrayChange$ = formParams$.pipe(
             switchMap(formParams => formParams.controls.toggles.valueChanges),
-            map(toogleFormGroup => Array.from(toogleFormGroup)),
             withLatestFrom(this.params$, this.toggles$),
-            switchMap(([toogleFormGroup, params, toggles]) => {
-                const setFlag$ = (index: number): Observable<FormGroup<AmpParamsFormControls>> => {
-                    if (index >= toogleFormGroup.length) {
-                        return of(undefined as FormGroup<AmpParamsFormControls>);
+            switchMap(([values, params, toggles]) => {
+                const setFlag$ = (index: number): Observable<void> => {
+                    if (index >= values.length) {
+                        return of(undefined);
                     }
 
                     const toggle = toggles[index];
-                    const value = toogleFormGroup[index].value;
+                    const value = values[index];
                     const currentValue = params.get(toggle.name);
 
                     if (typeof currentValue !== 'number') {
@@ -185,23 +179,23 @@ export class AmpParamsComponent {
                 return setFlag$(0);
             })
         );
+
         const sliderFormArrayChange$ = formParams$.pipe(
             switchMap(formParams => formParams.controls.sliders.valueChanges),
-            map(sliderFormGroup => Array.from(sliderFormGroup)),
             withLatestFrom(this.params$, this.sliders$),
-            switchMap(([sliderFormGroup, params, sliders]) => {
-                const setFlag$ = (index: number): Observable<FormGroup<AmpParamsFormControls>> => {
-                    if (index >= sliderFormGroup.length) {
-                        return of(undefined as FormGroup<AmpParamsFormControls>);
+            switchMap(([values, params, sliders]) => {
+                const setFlag$ = (index: number): Observable<void> => {
+                    if (index >= values.length) {
+                        return of(undefined);
                     }
 
                     const slider = sliders[index];
-                    const value = sliderFormGroup[index].value;
+                    const value = values[index] || 0;
                     const currentValue = params.get(slider.name);
 
                     let nextValue = value;
                     if (slider.factor !== 1) {
-                        nextValue = Math.round(nextValue / slider.factor);
+                        nextValue = Math.round(nextValue / (slider.factor || 1));
                     }
 
                     if (nextValue === currentValue) {
@@ -267,7 +261,7 @@ export class AmpParamsComponent {
                     } else {
                         this.message = err as string;
                     }
-                    return of(undefined as number);
+                    return of(undefined);
                 }),
                 withLatestFrom(this.params$),
                 switchMap(([newValue, params]) => {

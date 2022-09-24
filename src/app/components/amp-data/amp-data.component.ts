@@ -15,14 +15,14 @@ import { AmpDataService } from '../../services/amp-data.service';
     ]
 })
 export class AmpDataComponent {
-    private _ampInfo: AmpInfo;
+    private _ampInfo?: AmpInfo;
 
     @Input()
-    public set ampInfo(value: AmpInfo) {
+    public set ampInfo(value: AmpInfo | undefined) {
         this.ampDataService.ampInfo$.next(this._ampInfo = value);
     }
 
-    public get ampInfo(): AmpInfo {
+    public get ampInfo(): AmpInfo | undefined {
         return this._ampInfo;
     }
 
@@ -31,8 +31,8 @@ export class AmpDataComponent {
         public ampDataService: AmpDataService
     ) { }
 
-    public getStepError(datas: AmpDataHeader): string {
-        const currentStep = datas && this.ampInfo.stepMap.get(datas.step);
+    public getStepError(datas: AmpDataHeader): string | undefined {
+        const currentStep = datas && this.ampInfo?.stepMap.get(datas.step);
         if (currentStep?.isError) {
             if (datas.errorNumber && !isNaN(datas.errorNumber)) {
                 const error = ampErrors.get(datas.errorNumber);
@@ -42,31 +42,31 @@ export class AmpDataComponent {
             }
         }
 
-        return null;
+        return undefined;
     }
 
     public hasStepInfo(datas: AmpDataHeader): boolean {
-        const currentStep = datas && this.ampInfo.stepMap.get(datas.step);
+        const currentStep = datas && this.ampInfo?.stepMap.get(datas.step);
         return currentStep?.isError || !!currentStep?.label;
     }
 
     public getVal(datas: AmpDataHeader, i: number): number {
-        return datas?.val?.[i];
+        return datas?.val?.[i] || 0;
     }
 
     public getOut(datas: AmpDataHeader, i: number): number {
-        return datas?.out?.[i];
+        return datas?.out?.[i] || 0;
     }
 
     public getRef(datas: AmpDataHeader, i: number): number {
-        return this.ampInfo.tubes[i].ref || (typeof datas.ref === 'number' ? datas.ref : datas.ref[i]);
+        return this.ampInfo?.tubes?.[i].ref || (typeof datas.ref === 'number' ? datas.ref : datas.ref?.[i] || 0);
     }
 
     public getMin(datas: AmpDataHeader, i: number): number {
-        return this.ampInfo.tubes[i].min || (typeof datas.min === 'number' ? datas.min : datas.min[i]);
+        return this.ampInfo?.tubes?.[i].min || (typeof datas.min === 'number' ? datas.min : datas.min?.[i] || 0);
     }
 
     public getMax(datas: AmpDataHeader, i: number): number {
-        return this.ampInfo.tubes[i].max || (typeof datas.max === 'number' ? datas.max : datas.max[i]);
+        return this.ampInfo?.tubes?.[i].max || (typeof datas.max === 'number' ? datas.max : datas.max?.[i] || 0);
     }
 }

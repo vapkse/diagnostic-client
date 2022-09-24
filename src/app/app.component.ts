@@ -19,9 +19,9 @@ import { NowPlayingService } from './services/now-playing.service';
 })
 export class AppComponent extends DestroyDirective {
     @ViewChild(MatSidenavContainer, { static: false })
-    public sideNav: MatSidenavContainer;
+    public sideNav?: MatSidenavContainer;
 
-    public socketIoScript: HTMLScriptElement;
+    public socketIoScript?: HTMLScriptElement;
     public select$ = new Subject<number>();
 
     public constructor(
@@ -85,7 +85,8 @@ export class AppComponent extends DestroyDirective {
             } else {
                 void this.router.navigateByUrl(urlTree);
             }
-            void this.sideNav.start.close();
+
+            void this.sideNav?.start?.close();
         });
     }
 }

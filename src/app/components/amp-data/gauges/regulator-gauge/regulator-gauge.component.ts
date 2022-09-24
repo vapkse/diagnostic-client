@@ -28,11 +28,11 @@ export class RegulatorGaugeOptions extends GaugeOptions {
 })
 export class RegulatorGaugeComponent extends GaugeBase<RegulatorGaugeOptions> implements OnChanges, OnInit {
     @Input() public value = 0;
-    @Input() public tube: Tubeinfo;
+    @Input() public tube?: Tubeinfo;
     @Input() public ref = 0;
     @Input() public min = 0;
     @Input() public max = 0;
-    @Input() public ampinfos: AmpInfo;
+    @Input() public ampinfos?: AmpInfo;
     @Input() public error = false;
 
     protected options = new RegulatorGaugeOptions();
@@ -117,6 +117,11 @@ export class RegulatorGaugeComponent extends GaugeBase<RegulatorGaugeOptions> im
     }
 
     public ngOnInit(): void {
+        if (!this.tube || !this.ampinfos) {
+            console.error('ampinfos or tube not available');
+            return;
+        }
+
         const options = this.options;
         options.value = this.value * 100 / 255;
         options.title = this.tube.name;
@@ -128,6 +133,11 @@ export class RegulatorGaugeComponent extends GaugeBase<RegulatorGaugeOptions> im
     }
 
     protected getText(textName: string, value?: number): string {
+        if (!this.tube || !this.ampinfos) {
+            console.error('ampinfos or tube not available');
+            return '';
+        }
+
         const options = this.options;
         const valueOffset = this.tube.valueOffset || this.ampinfos.valueOffset || 0;
         const valueFactor = this.tube.valueFactor || this.ampinfos.valueFactor || 1;

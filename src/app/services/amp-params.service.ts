@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, combineLatest, debounceTime, map, Observable, of, ReplaySubject, switchMap, take, tap, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, debounceTime, filter, map, Observable, of, ReplaySubject, switchMap, take, tap, throwError, withLatestFrom } from 'rxjs';
 
 import { AmpDataHeader, AmpInfo, AmpParamsRequest } from '../common/amp';
 import { shareReplayLast } from '../common/custom-operators';
@@ -12,34 +12,48 @@ class CacheInfo {
 
 @Injectable()
 export class AmpParamsService {
-    public ampInfo$ = new ReplaySubject<AmpInfo>(1);
+    public ampInfo$ = new ReplaySubject<AmpInfo | undefined>(1);
     public refresh$ = new BehaviorSubject<boolean>(false);
 
-    public currentParams$: Observable<Map<string, unknown>>;
+    public currentParams$: Observable<Map<string, unknown> | undefined>;
 
-    public lastError: Error;
+    public lastError?: Error;
     private cache = new Map<number, CacheInfo>();
 
     public constructor(private ampService: AmpService) {
 
-        const sendRequest$ = (id: number): Observable<Map<string, unknown>> => this.ampService.sendRequest$(id, AmpParamsRequest.get('getParams'), 0).pipe(
-            switchMap(response => of(Object.keys(response.datas)
-                .map(key => key as keyof AmpDataHeader)
-                .reduce((m, key) => m.set(key, response.datas[key]), new Map<string, unknown>()))
-            )
-        );
+        const sendRequest$ = (id: number): Observable<Map<string, unknown> | undefined> => {
+            const request = AmpParamsRequest.get('getParams');
+            if (request === undefined) {
+                return of(undefined);
+            }
+
+            return this.ampService.sendRequest$(id, request, 0).pipe(
+                map(response => {
+                    if (!response?.datas) {
+                        return undefined;
+                    }
+
+                    const keys = Object.keys(response.datas) as Array<keyof AmpDataHeader>;
+                    return keys.reduce((m, key) => {
+                        const data = response.datas?.[key];
+                        return data !== undefined ? m.set(key, data) : m;
+                    }, new Map<string, unknown>());
+                })
+            );
+        };
 
         this.currentParams$ = combineLatest([this.ampInfo$, this.refresh$]).pipe(
             debounceTime(5),
             withLatestFrom(this.ampService.ampStatusMap$),
             switchMap(([[ampInfo, forceRefresh], ampStatusMap]) => {
                 if (!ampInfo) {
-                    return of(new Map<string, unknown>());
+                    return of(undefined);
                 }
 
                 const now = Date.now();
                 const status = ampStatusMap.get(ampInfo.id);
-                const ignoreCache = status?.step < 3;
+                const ignoreCache = !status || status.step < 3;
                 const cacheEntry = !forceRefresh && !ignoreCache && this.cache.get(ampInfo.id);
                 if (cacheEntry) {
                     const cacheIsTooOld = now - cacheEntry.timeStamp < 120000;
@@ -54,7 +68,7 @@ export class AmpParamsService {
                     catchError(err => {
                         this.lastError = err as Error;
                         console.log('Error in param service: ', err);
-                        return of(null);
+                        return of(undefined);
                     }),
                     tap(params => {
                         if (params) {
@@ -67,14 +81,23 @@ export class AmpParamsService {
         );
     }
 
-    public sendRequest$ = (action: string, val?: number): Observable<number> => this.ampInfo$.pipe(
-        switchMap(ampInfo => this.ampService.sendRequest$(ampInfo.id, AmpParamsRequest.get(action), val)),
-        take(1),
-        map(response => {
-            if ('resetParams' === action) {
-                this.refresh$.next(true);
-            }
-            return response.datas?.extraValue;
-        })
-    );
+    public sendRequest$(action: string, val?: number): Observable<number | undefined> {
+        const request = AmpParamsRequest.get('getParams');
+        if (request === undefined) {
+            return throwError(() => new Error('getParams return undefined'));
+        }
+
+        return this.ampInfo$.pipe(
+            filter(Boolean),
+            switchMap(ampInfo => this.ampService.sendRequest$(ampInfo.id, request, val).pipe(
+                map(response => {
+                    if ('resetParams' === action) {
+                        this.refresh$.next(true);
+                    }
+                    return response.datas?.extraValue;
+                })
+            )),
+            take(1)
+        );
+    }
 }

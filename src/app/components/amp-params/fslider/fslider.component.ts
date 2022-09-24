@@ -16,7 +16,7 @@ export class FSliderComponent extends DestroyDirective implements ControlValueAc
     @Input() public max = 100;
     @Input() public step = 1;
     @Input() public decimal = 0;
-    @Input() public title: string;
+    @Input() public title = '';
 
     @ViewChild('valuecontrol', { static: true })
     public set valueElementRef(elementRef: ElementRef<HTMLElement>) {
@@ -31,8 +31,8 @@ export class FSliderComponent extends DestroyDirective implements ControlValueAc
     private hasFocus = false;
 
     private selectAll$ = new Subject<void>();
-    private _value: number;
-    private _valueElement: HTMLElement;
+    private _value?: number;
+    private _valueElement?: HTMLElement;
     private valueElement$ = new ReplaySubject<HTMLElement>(1);
 
     public constructor(
@@ -84,13 +84,13 @@ export class FSliderComponent extends DestroyDirective implements ControlValueAc
                         break;
 
                     case 'ArrowUp':
-                        if (!isNaN(this.value)) {
+                        if (this.value !== undefined && !isNaN(this.value)) {
                             writeValue(this.value + +this.step);
                         }
                         break;
 
                     case 'ArrowDown':
-                        if (!isNaN(this.value)) {
+                        if (this.value !== undefined && !isNaN(this.value)) {
                             writeValue(this.value - +this.step);
                         }
                         break;
@@ -145,31 +145,32 @@ export class FSliderComponent extends DestroyDirective implements ControlValueAc
             const range = document.createRange();
             range.selectNodeContents(valueElement);
             const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
+            if (sel) {
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
         });
     }
 
     /** Retourne ou definit si le selecteur est desactivé. */
     public get disabled(): boolean {
-        return this.control ? this.control.disabled : this._disabled;
+        return this.control ? this.control.disabled || false : this._disabled;
     }
 
     @Input()
     public set disabled(value: boolean) {
-        const disabled = coerceBooleanProperty(value);
-        this._disabled = disabled || null;
+        this._disabled = coerceBooleanProperty(value);
         this.changeDetectorRef.markForCheck();
     }
 
     // get accessor
-    public get value(): number {
+    public get value(): number | undefined {
         return this._value;
     }
 
     // ************* ControlValueAccessor Implementation **************
     // set accessor including call the onchange callback
-    public set value(value: number) {
+    public set value(value: number | undefined) {
         if (value !== this._value) {
             this.writeValue(value);
             this.onChangeCallback(value);
@@ -179,8 +180,8 @@ export class FSliderComponent extends DestroyDirective implements ControlValueAc
     public onTouchedCallback = (): void => undefined as void;
     public onChangeCallback = (_: unknown): void => undefined as void;
 
-    public writeValue(value: number): void {
-        if (isNaN(value)) {
+    public writeValue(value: number | undefined): void {
+        if (value === undefined || isNaN(value)) {
             return;
         }
 
@@ -226,6 +227,6 @@ export class FSliderComponent extends DestroyDirective implements ControlValueAc
     }
 
     private get displayedValue(): string {
-        return isNaN(this.value) ? '' : this.value.toFixed(this.decimal);
+        return this.value !== undefined && !isNaN(this.value) ? this.value.toFixed(this.decimal) : '';
     }
 }

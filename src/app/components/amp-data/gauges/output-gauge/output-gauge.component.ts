@@ -9,7 +9,7 @@ export class OutputGaugeOptions extends GaugeOptions {
         this.style = 'horizontal';
         this.titleTextSize = 16;
         this.valueTextSize = 16;
-        this.limitsColor = null;
+        this.limitsColor = '';
         this.speed = 0.4;
         this.limits = [2, 20, 80, 98];
     }
@@ -21,8 +21,8 @@ export class OutputGaugeOptions extends GaugeOptions {
     template: '<canvas class="gauge"></canvas>'
 })
 export class OutputGaugeComponent extends GaugeBase<OutputGaugeOptions> implements OnChanges, OnInit {
-    @Input() public ampinfos: AmpInfo;
-    @Input() public tube: Tubeinfo;
+    @Input() public ampinfos?: AmpInfo;
+    @Input() public tube?: Tubeinfo;
 
     protected options = new OutputGaugeOptions();
 
@@ -41,6 +41,11 @@ export class OutputGaugeComponent extends GaugeBase<OutputGaugeOptions> implemen
     }
 
     public refresh(): void {
+        if (!this.ampinfos) {
+            console.error('ampinfos not available');
+            return;
+        }
+
         if (this.ampinfos.outputLimits) {
             this.options.limits = this.ampinfos.outputLimits;
         }
@@ -100,9 +105,14 @@ export class OutputGaugeComponent extends GaugeBase<OutputGaugeOptions> implemen
     }
 
     protected getText(textName: string, value?: number): string {
+        if (!this.tube || !this.ampinfos) {
+            console.error('ampinfos or tube not available');
+            return '';
+        }
+
         if (textName === 'valueText') {
             const valueFactor = this.tube.valueFactor || this.ampinfos.valueFactor || 1;
-            if (valueFactor && !isNaN(this.options.value)) {
+            if (valueFactor && value !== undefined && !isNaN(this.options.value)) {
                 return `${Math.floor(value * 10) / 10}%`;
             } else {
                 return 'n.c.';

@@ -7,35 +7,42 @@ import { AmpService } from './amp.service';
 
 @Injectable()
 export class AmpDataService {
-    public ampInfo$ = new ReplaySubject<AmpInfo>(1);
+    public ampInfo$ = new ReplaySubject<AmpInfo | undefined>(1);
 
     public tempInfos$: Observable<ReadonlyArray<FieldInfo>>;
     public ampData$: Observable<AmpDataHeader>;
     public ampStatus$: Observable<AmpStatus>;
 
     public constructor(ampService: AmpService) {
-        const dataInfos$ = this.ampInfo$.pipe(
+        const ampInfo$ = this.ampInfo$.pipe(
+            filter(Boolean),
+            shareReplayLast()
+        );
+
+        const dataInfos$ = ampInfo$.pipe(
             map(ampInfo => ampInfo?.dataInfos),
-            filter(ampInfo => !!ampInfo),
+            filter(Boolean),
             shareReplayLast()
         );
 
         this.tempInfos$ = dataInfos$.pipe(
+            filter(Boolean),
             map(dataInfos => dataInfos.find(f => f.name === 'temp')?.fields || new Array<FieldInfo>()),
             shareReplayLast()
         );
 
         this.ampData$ = ampService.ampData$.pipe(
-            withLatestFrom(this.ampInfo$),
-            filter(([ampData, ampInfo]) => ampData.id === ampInfo.id),
-            map(([ampData]) => ampData.datas),
+            withLatestFrom(ampInfo$),
+            map(([ampData, ampInfo]) => ampData.id === ampInfo.id ? ampData.datas : undefined),
+            filter(Boolean),
             shareReplayLast()
         );
 
         this.ampStatus$ = ampService.ampStatusMap$.pipe(
-            withLatestFrom(this.ampInfo$),
+            withLatestFrom(ampInfo$),
             map(([ampStatusMap, ampInfo]) => ampStatusMap.get(ampInfo.id)),
-            startWith(undefined as AmpStatus),
+            filter(Boolean),
+            startWith({} as AmpStatus),
             shareReplayLast()
         );
     }

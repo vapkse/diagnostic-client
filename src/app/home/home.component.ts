@@ -13,7 +13,7 @@ import { NowPlayingService } from '../services/now-playing.service';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent {
-    @ViewChildren(AmpDataComponent) public ampDataComponents: QueryList<AmpDataComponent>;
+    @ViewChildren(AmpDataComponent) public ampDataComponents?: QueryList<AmpDataComponent>;
 
     public loading$: Observable<boolean>;
 
@@ -27,6 +27,6 @@ export class HomeComponent {
             startWith(true)
         );
 
-        ampService.selectedId$.next(null);
+        ampService.selectedId$.next(undefined);
     }
 }
