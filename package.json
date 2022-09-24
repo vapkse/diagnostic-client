@@ -16,7 +16,7 @@
         "lint": "ng lint",
         "e2e": "ng e2e",
         "e2e:watch": "watch \"npm run e2e\" src e2e --wait=1",
-        "deploy": "firebase deploy",
+        "deploy": "firebase login --reauth && firebase deploy",
         "electron-builder": "electron-builder",
         "electron": "npm run build:electron && ng build && electron .",
         "start:electron": "electron .",
