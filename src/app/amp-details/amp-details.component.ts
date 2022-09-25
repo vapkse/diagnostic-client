@@ -12,7 +12,10 @@ import { AmpService } from '../services';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AmpDetailsComponent extends DestroyDirective {
-    public constructor(public ampService: AmpService, route: ActivatedRoute) {
+    public constructor(
+        protected ampService: AmpService,
+        route: ActivatedRoute
+    ) {
         super();
 
         route.params.pipe(

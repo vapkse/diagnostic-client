@@ -15,11 +15,11 @@ import { NowPlayingService } from '../services/now-playing.service';
 export class HomeComponent {
     @ViewChildren(AmpDataComponent) public ampDataComponents?: QueryList<AmpDataComponent>;
 
-    public loading$: Observable<boolean>;
+    protected loading$: Observable<boolean>;
 
     public constructor(
-        public ampService: AmpService,
-        public nowPlayingService: NowPlayingService
+        protected ampService: AmpService,
+        protected nowPlayingService: NowPlayingService
     ) {
 
         this.loading$ = of(false).pipe(

@@ -19,14 +19,14 @@ export class FSliderComponent extends DestroyDirective implements ControlValueAc
     @Input() public title = '';
 
     @ViewChild('valuecontrol', { static: true })
-    public set valueElementRef(elementRef: ElementRef<HTMLElement>) {
+    protected set valueElementRef(elementRef: ElementRef<HTMLElement>) {
         this.valueElement$.next(this._valueElement = elementRef?.nativeElement);
     }
 
     @Input() @HostBinding('attr.disabled')
     private _disabled = false;
 
-    public focus$ = new Subject<void>();
+    protected focus$ = new Subject<void>();
 
     private hasFocus = false;
 
@@ -207,17 +207,17 @@ export class FSliderComponent extends DestroyDirective implements ControlValueAc
     }
     // ************* End of ControlValueAccessor Implementation **************
 
-    public focus(): void {
+    protected focus(): void {
         void this._valueElement?.focus();
     }
 
-    public oninputchange(event: Event): void {
+    protected oninputchange(event: Event): void {
         const input = event.target as HTMLInputElement;
         this.writeValue(+input.value);
         this.onChangeCallback(this.value);
     }
 
-    public oninput(event: Event): void {
+    protected oninput(event: Event): void {
         const input = event.target as HTMLInputElement;
         this.writeValue(+input.value);
     }

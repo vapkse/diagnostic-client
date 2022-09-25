@@ -27,11 +27,11 @@ export class AmpDataComponent {
     }
 
     public constructor(
-        public ampService: AmpService,
-        public ampDataService: AmpDataService
+        protected ampService: AmpService,
+        protected ampDataService: AmpDataService
     ) { }
 
-    public getStepError(datas: AmpDataHeader): string | undefined {
+    protected getStepError(datas: AmpDataHeader): string | undefined {
         const currentStep = datas && this.ampInfo?.stepMap.get(datas.step);
         if (currentStep?.isError) {
             if (datas.errorNumber && !isNaN(datas.errorNumber)) {
@@ -45,28 +45,28 @@ export class AmpDataComponent {
         return undefined;
     }
 
-    public hasStepInfo(datas: AmpDataHeader): boolean {
+    protected hasStepInfo(datas: AmpDataHeader): boolean {
         const currentStep = datas && this.ampInfo?.stepMap.get(datas.step);
         return currentStep?.isError || !!currentStep?.label;
     }
 
-    public getVal(datas: AmpDataHeader, i: number): number {
+    protected getVal(datas: AmpDataHeader, i: number): number {
         return datas?.val?.[i] || 0;
     }
 
-    public getOut(datas: AmpDataHeader, i: number): number {
+    protected getOut(datas: AmpDataHeader, i: number): number {
         return datas?.out?.[i] || 0;
     }
 
-    public getRef(datas: AmpDataHeader, i: number): number {
+    protected getRef(datas: AmpDataHeader, i: number): number {
         return this.ampInfo?.tubes?.[i].ref || (typeof datas.ref === 'number' ? datas.ref : datas.ref?.[i] || 0);
     }
 
-    public getMin(datas: AmpDataHeader, i: number): number {
+    protected getMin(datas: AmpDataHeader, i: number): number {
         return this.ampInfo?.tubes?.[i].min || (typeof datas.min === 'number' ? datas.min : datas.min?.[i] || 0);
     }
 
-    public getMax(datas: AmpDataHeader, i: number): number {
+    protected getMax(datas: AmpDataHeader, i: number): number {
         return this.ampInfo?.tubes?.[i].max || (typeof datas.max === 'number' ? datas.max : datas.max?.[i] || 0);
     }
 }

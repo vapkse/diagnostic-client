@@ -8,7 +8,11 @@ import { AmpService } from '../../../services';
 import { DestroyDirective } from '../../destroy/destroy.directive';
 
 class Message {
-    public constructor(public content: string, public duration: number, public type?: string) { }
+    public constructor(
+        public content: string,
+        public duration: number,
+        public type?: string
+    ) { }
 }
 
 @Component({
@@ -24,12 +28,15 @@ export class AmpControlsComponent extends DestroyDirective {
     @ViewChild('snackBarTemplate', { static: false })
     private snackBarTemplate?: TemplateRef<unknown>;
 
-    public reset$ = new Subject<void>();
-    public action$ = new Subject<string>();
+    protected reset$ = new Subject<void>();
+    protected action$ = new Subject<string>();
 
-    public onReset$: Observable<boolean>;
+    protected onReset$: Observable<boolean>;
 
-    public constructor(public ampService: AmpService, private snackBar: MatSnackBar) {
+    public constructor(
+        protected ampService: AmpService,
+        private snackBar: MatSnackBar
+    ) {
         super();
 
         const reset$ = this.reset$.pipe(

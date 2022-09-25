@@ -30,15 +30,15 @@ interface AmpParamsFormControls {
 })
 export class AmpParamsComponent {
     @HostBinding('class.waiter')
-    public waiter = true;
+    protected waiter = true;
 
-    public message?: string;
-    public sliders$: Observable<ReadonlyArray<Slider>>;
-    public toggles$: Observable<ReadonlyArray<Toggle>>;
-    public params$: Observable<Map<string, unknown>>;
-    public title$: Observable<string>;
+    protected message?: string;
+    protected sliders$: Observable<ReadonlyArray<Slider>>;
+    protected toggles$: Observable<ReadonlyArray<Toggle>>;
+    protected params$: Observable<Map<string, unknown>>;
+    protected title$: Observable<string>;
 
-    public form$: Observable<FormGroup<AmpParamsFormControls>>;
+    protected form$: Observable<FormGroup<AmpParamsFormControls>>;
 
     private _ampInfo?: AmpInfo;
 
@@ -55,8 +55,8 @@ export class AmpParamsComponent {
     }
 
     public constructor(
-        public ampParamsService: AmpParamsService,
-        public ampService: AmpService,
+        protected ampParamsService: AmpParamsService,
+        protected ampService: AmpService,
         private changeDetectorRef: ChangeDetectorRef
     ) {
         this.title$ = this.ampParamsService.ampInfo$.pipe(
@@ -222,7 +222,7 @@ export class AmpParamsComponent {
         );
     }
 
-    public getFlag(params: Map<string, unknown>, name: string, flag: number): boolean {
+    protected getFlag(params: Map<string, unknown>, name: string, flag: number): boolean {
         if (typeof params.get(name) !== 'number') {
             console.log('Invalid name for getFlag', name);
             return false;
@@ -232,7 +232,7 @@ export class AmpParamsComponent {
         return !!(flags & flag);
     }
 
-    public sendRequest$(request: SendRequestParams): Observable<void> {
+    protected sendRequest$(request: SendRequestParams): Observable<void> {
         return asyncSwitchMap(() => {
             this.waiter = true;
             this.changeDetectorRef.markForCheck();

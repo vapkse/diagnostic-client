@@ -16,20 +16,20 @@ export class NowPlayingArtistComponent extends DestroyDirective {
     public artist?: Artist;
 
     public constructor(
-        public nowPlayingService: NowPlayingService
+        protected nowPlayingService: NowPlayingService
     ) {
         super();
     }
 
-    public openInNewTab(url: string): void {
+    protected openInNewTab(url: string): void {
         void window.open(url, '_blank')?.focus();
     }
 
-    public trackBy(_index: number, webSite: WebSite): string {
+    protected trackBy(_index: number, webSite: WebSite): string {
         return webSite.url;
     }
 
-    public hasArtistInfos(artist: Artist): boolean {
+    protected hasArtistInfos(artist: Artist): boolean {
         return !!artist.intFormedYear || !!artist.intDiedYear || !!artist.strMood || !!artist.intBornYear || !!artist.strStyle || !!artist.strGenre || !!artist.strCountry || !!artist.strCountryCode;
     }
 }

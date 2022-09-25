@@ -12,8 +12,8 @@ import { SliderItemDirective } from './slider-item.directive';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SliderComponent {
-    public showButtons$: Observable<boolean>;
     public refresh$ = new Subject<void>();
+    protected showButtons$: Observable<boolean>;
 
     private _items?: QueryList<ElementRef<HTMLDivElement>>;
     private _slider?: ElementRef<HTMLDivElement>;
@@ -30,30 +30,30 @@ export class SliderComponent {
     }
 
     @ContentChildren(SliderItemDirective, { read: ElementRef, descendants: true })
-    public set items(items: QueryList<ElementRef<HTMLDivElement>> | undefined) {
+    protected set items(items: QueryList<ElementRef<HTMLDivElement>> | undefined) {
         this._items = items;
         this.refresh$.next();
     }
 
-    public get items(): QueryList<ElementRef<HTMLDivElement>> | undefined {
+    protected get items(): QueryList<ElementRef<HTMLDivElement>> | undefined {
         return this._items;
     }
 
     @ViewChild('slides')
-    public set slidesContainer(slider: ElementRef<HTMLDivElement> | undefined) {
+    protected set slidesContainer(slider: ElementRef<HTMLDivElement> | undefined) {
         this._slider = slider;
         this.refresh$.next();
     }
 
-    public get slidesContainer(): ElementRef<HTMLDivElement> | undefined {
+    protected get slidesContainer(): ElementRef<HTMLDivElement> | undefined {
         return this._slider;
     }
 
-    public get currentItem(): ElementRef<HTMLDivElement> | undefined {
+    protected get currentItem(): ElementRef<HTMLDivElement> | undefined {
         return this.items?.find((_, index) => index === this.slidesIndex);
     }
 
-    public onClickLeft(): void {
+    protected onClickLeft(): void {
         const currentItem = this.currentItem;
         if (!this.slidesContainer || !currentItem) {
             return;
@@ -66,7 +66,7 @@ export class SliderComponent {
         }
     }
 
-    public onClickRight(): void {
+    protected onClickRight(): void {
         const currentItem = this.currentItem;
         if (!this.slidesContainer || !this.items || !currentItem) {
             return;

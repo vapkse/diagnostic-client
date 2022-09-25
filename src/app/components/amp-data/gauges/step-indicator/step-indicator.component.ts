@@ -59,7 +59,9 @@ export class StepIndicatorComponent implements OnChanges, OnInit {
     private elapsedTimeKey = 'elapsedTime';
     private stepIndexKey = 'stepIndex';
 
-    public constructor(public el: ElementRef<HTMLElement>) {
+    public constructor(
+        protected el: ElementRef<HTMLElement>
+    ) {
         this.element = el.nativeElement;
     }
 

@@ -19,14 +19,14 @@ import { NowPlayingService } from './services/now-playing.service';
 })
 export class AppComponent extends DestroyDirective {
     @ViewChild(MatSidenavContainer, { static: false })
-    public sideNav?: MatSidenavContainer;
+    protected sideNav?: MatSidenavContainer;
 
-    public socketIoScript?: HTMLScriptElement;
-    public select$ = new Subject<number | undefined>();
+    protected socketIoScript?: HTMLScriptElement;
+    protected select$ = new Subject<number | undefined>();
 
     public constructor(
-        public ampService: AmpService,
-        public navigationService: NavigationService,
+        protected ampService: AmpService,
+        protected navigationService: NavigationService,
         private ngLocation: Location,
         private router: Router,
         route: ActivatedRoute,
